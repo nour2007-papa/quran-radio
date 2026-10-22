@@ -808,6 +808,24 @@
       R("الشيخ محمد صديق المنشاوي", "Sceicco Mohammed Siddiq Al-Minshawi", "minsh", { url: "https://backup.qurango.net/radio/mohammedsiddiqalminshawi", rid: 112, base: "https://server10.mp3quran.net/minsh/" }),
       R("الشيخ أحمد العجمي", "Sceicco Ahmad Al-Ajmy", "ajm", { url: "https://backup.qurango.net/radio/ahmadalajmy", rid: 5, base: "https://server10.mp3quran.net/ajm/" }),
       R("الشيخ محمد محمود الطبلاوي", "Sceicco Mohammed Mahmoud Al-Tablawy", "tblawi", { url: "https://backup.qurango.net/radio/mohammadaltablaway", rid: 106, base: "https://server12.mp3quran.net/tblawi/" }),
+      R("الشيخ سعود الشريم", "Sceicco Saud Al-Shuraim", "shuraim", { find: ["سعود", "الشريم"] }),
+      R("الشيخ علي الحذيفي", "Sceicco Ali Al-Hudhaify", "hudhaify", { find: ["علي", "الحذيفي"] }),
+      R("الشيخ مصطفى إسماعيل", "Sceicco Mustafa Ismail", "mustafa", { rid: 125, base: "https://server8.mp3quran.net/mustafa/" }),
+      R("الشيخ محمد أيوب", "Sceicco Mohammad Ayyub", "ayyub", { rid: 109, base: "https://server8.mp3quran.net/ayyub/" }),
+      R("الشيخ محمود علي البنا", "Sceicco Mahmoud Ali Al-Banna", "bna", { rid: 121, base: "https://server8.mp3quran.net/bna/" }),
+      R("الشيخ محمد جبريل", "Sceicco Mohammad Jibril", "jbrl", { rid: 111, base: "https://server8.mp3quran.net/jbrl/" }),
+      R("الشيخ فارس عباد", "Sceicco Fares Abbad", "fares", { find: ["فارس", "عباد"] }),
+      R("الشيخ علي جابر", "Sceicco Ali Jaber", "jaber", { find: ["علي", "جابر"] }),
+      R("الشيخ صلاح بوخاطر", "Sceicco Salah Bukhatir", "bukhatir", { find: ["بوخاطر"] }),
+      R("الشيخ بندر بليلة", "Sceicco Bandar Baleela", "balilah", { rid: 217, base: "https://server6.mp3quran.net/balilah/" }),
+      R("الشيخ خالد الجليل", "Sceicco Khalid Al-Jalil", "jleel", { rid: 20, base: "https://server10.mp3quran.net/jleel/" }),
+      R("الشيخ عبدالله بصفر", "Sceicco Abdullah Basfar", "basfar", { find: ["بصفر"] }),
+      R("الشيخ عبدالله الجهني", "Sceicco Abdullah Al-Juhani", "juhani", { find: ["عبدالله", "الجهني"] }),
+      R("الشيخ هاني الرفاعي", "Sceicco Hani Al-Rifai", "rifai", { find: ["هاني", "الرفاعي"] }),
+      R("الشيخ أبو بكر الشاطري", "Sceicco Abu Bakr Al-Shatri", "shatri", { find: ["الشاطري"] }),
+      R("الشيخ ناصر القطامي", "Sceicco Nasser Al-Qatami", "qatami", { find: ["ناصر", "القطامي"] }),
+      R("الشيخ إدريس أبكر", "Sceicco Idris Abkar", "abkr", { rid: 12, base: "https://server6.mp3quran.net/abkr/" }),
+      R("الشيخ محمد رفعت", "Sceicco Mohammad Refat", "refat", { rid: 241, base: "https://server14.mp3quran.net/refat/" }),
       { name: "تلاوات خاشعة", nameIt: "Recitazioni toccanti", tag: "متنوعة", tagIt: "Varie", initial: "📖", url: "https://backup.qurango.net/radio/salma" },
       { name: "سورة البقرة بقراءات متنوعة", nameIt: "Sura Al-Baqarah vari lettori", tag: "خاص", tagIt: "Speciale", initial: "🕋", url: "https://backup.qurango.net/radio/albaqarah" },
       R("الشيخ حسن صالح", "Sceicco Hassan Saleh", "hsaleh", { tag: "مصحف كامل", tagIt: "Corano completo", initial: "📿", find: "حسن صالح" })
@@ -817,7 +835,7 @@
       return u.replace(/([^:])\/{2,}/g, '$1/').replace(/\/?$/, '/');
     }
 
-    let allReciters = null;
+    let allRecitersP = null;
     function resolveStation(s) {
       if (s.resolving) return s.resolving;
       if (!s.rid && !s.find) return Promise.resolve();
@@ -829,12 +847,15 @@
             if (!r.ok) throw new Error(`status ${r.status}`);
             rec = ((await r.json()).reciters || [])[0];
           } else {
-            if (!allReciters) {
-              const r = await fetch(MP3Q_API);
-              if (!r.ok) throw new Error(`status ${r.status}`);
-              allReciters = (await r.json()).reciters || [];
+            if (!allRecitersP) {
+              allRecitersP = fetch(MP3Q_API).then(r => {
+                if (!r.ok) throw new Error(`status ${r.status}`);
+                return r.json();
+              }).then(d => d.reciters || []);
             }
-            rec = allReciters.find(x => x.name.includes(s.find));
+            const all = await allRecitersP;
+            const toks = [].concat(s.find);
+            rec = all.find(x => toks.every(t => x.name.includes(t)));
           }
           const mo = rec && (rec.moshaf.find(m => m.moshaf_type === 11) || rec.moshaf[0]);
           if (mo && mo.server) {
@@ -844,7 +865,9 @@
           }
         } catch (e) {
           console.warn('resolve', s.code, e);
+          allRecitersP = null;
         }
+        s.done = true;
       })();
       return s.resolving;
     }
@@ -1034,6 +1057,7 @@
     function renderGrid() {
       grid.innerHTML = '';
       stations.forEach((s, i) => {
+        if (s.done && !s.base && !s.url) return;
         const card = document.createElement('div');
         card.className = `station-card${i === currentIndex ? ' active' : ''}`;
 
@@ -1256,6 +1280,9 @@
     applyLang();
     selectStation(0, false);
     Promise.all(stations.filter(x => x.rid).map(resolveStation)).then(renderGrid);
+    setTimeout(() => {
+      Promise.all(stations.filter(x => x.find).map(resolveStation)).then(renderGrid);
+    }, 2500);
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
