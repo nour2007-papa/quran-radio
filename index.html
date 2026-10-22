@@ -793,30 +793,64 @@
 
     const GHAMDI_LIST = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,39,40,41,42,43,45,46,47,49,50,51,52,53,54,55,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,73,75,76,77,80,82,83,85,86,87,88,89,90,91,92,93,94,95,97,98,99,101,102,103,104,105,106,107,108,109,110,111,112,113,114];
 
-    function surahUrl(server, code, num) {
-      return `https://${server}.mp3quran.net/download/${code}${String(num).padStart(3, '0')}.mp3`;
-    }
-
+    const MP3Q_API = 'https://www.mp3quran.net/api/v3/reciters?language=ar';
+    // rid = رقم القارئ في mp3quran API (يُحدَّث الرابط تلقائيًا منه) · base = رابط احتياطي · find = بحث بالاسم
+    const R = (name, nameIt, code, extra) => Object.assign({ name, nameIt, tag: "قارئ", tagIt: "Lettore", initial: "🎙️", code, list: FULL_LIST }, extra);
     const stations = [
       { name: "الإذاعة الرئيسية", nameIt: "Radio Principale", tag: "متنوعة", tagIt: "Varie", initial: "📻", url: "https://backup.qurango.net/radio/mix" },
-      { name: "الشيخ مشاري العفاسي", nameIt: "Sceicco Mishary Al-Afasy", tag: "قارئ", tagIt: "Lettore", initial: "🎙️", url: "https://backup.qurango.net/radio/misharyalafasi", server: "server8", code: "afs", list: FULL_LIST },
-      { name: "الشيخ ماهر المعيقلي", nameIt: "Sceicco Maher Al-Muaiqly", tag: "قارئ", tagIt: "Lettore", initial: "🎙️", url: "https://backup.qurango.net/radio/maher", server: "server12", code: "maher", list: FULL_LIST },
-      { name: "الشيخ سعد الغامدي", nameIt: "Sceicco Saad Al-Ghamdi", tag: "قارئ", tagIt: "Lettore", initial: "🎙️", url: "https://backup.qurango.net/radio/saadalghamdi", server: "server6", code: "ghamdi", list: GHAMDI_LIST },
-      { name: "الشيخ عبدالرحمن السديس", nameIt: "Sceicco Abdul Rahman Al-Sudais", tag: "قارئ", tagIt: "Lettore", initial: "🎙️", url: "https://backup.qurango.net/radio/abdulrahmanalsudaes", server: "server11", code: "sds", list: FULL_LIST },
-      { name: "الشيخ عبدالباسط عبدالصمد", nameIt: "Sceicco Abdul Basit Abdul Samad", tag: "قارئ", tagIt: "Lettore", initial: "🎙️", url: "https://backup.qurango.net/radio/abdulbasitabdulsamad", server: "server7", code: "basit", list: FULL_LIST },
-      { name: "الشيخ ياسر الدوسري", nameIt: "Sceicco Yasser Al-Dosari", tag: "قارئ", tagIt: "Lettore", initial: "🎙️", url: "https://backup.qurango.net/radio/yasseraldosari", server: "server11", code: "yasser", list: FULL_LIST },
-      { name: "الشيخ محمود خليل الحصري", nameIt: "Sceicco Mahmoud Khalil Al-Hussary", tag: "قارئ", tagIt: "Lettore", initial: "🎙️", url: "https://backup.qurango.net/radio/mahmoudkhalilalhussary", server: "server13", code: "husr", list: FULL_LIST },
-      { name: "الشيخ محمد صديق المنشاوي", nameIt: "Sceicco Mohammed Siddiq Al-Minshawi", tag: "قارئ", tagIt: "Lettore", initial: "🎙️", url: "https://backup.qurango.net/radio/mohammedsiddiqalminshawi", server: "server10", code: "minsh", list: FULL_LIST },
-      { name: "الشيخ أحمد العجمي", nameIt: "Sceicco Ahmad Al-Ajmy", tag: "قارئ", tagIt: "Lettore", initial: "🎙️", url: "https://backup.qurango.net/radio/ahmadalajmy", server: "server10", code: "ajm", list: FULL_LIST },
-      { name: "الشيخ محمد محمود الطبلاوي", nameIt: "Sceicco Mohammed Mahmoud Al-Tablawy", tag: "قارئ", tagIt: "Lettore", initial: "🎙️", url: "https://backup.qurango.net/radio/mohammadaltablaway", server: "server12", code: "tblawi", list: FULL_LIST },
+      R("الشيخ مشاري العفاسي", "Sceicco Mishary Al-Afasy", "afs", { url: "https://backup.qurango.net/radio/misharyalafasi", rid: 123, base: "https://server8.mp3quran.net/afs/" }),
+      R("الشيخ ماهر المعيقلي", "Sceicco Maher Al-Muaiqly", "maher", { url: "https://backup.qurango.net/radio/maher", rid: 102, base: "https://server12.mp3quran.net/maher/" }),
+      R("الشيخ سعد الغامدي", "Sceicco Saad Al-Ghamdi", "ghamdi", { url: "https://backup.qurango.net/radio/saadalghamdi", find: "سعد الغامدي", base: "https://server7.mp3quran.net/s_gmd/", list: GHAMDI_LIST }),
+      R("الشيخ عبدالرحمن السديس", "Sceicco Abdul Rahman Al-Sudais", "sds", { url: "https://backup.qurango.net/radio/abdulrahmanalsudaes", rid: 54, base: "https://server11.mp3quran.net/sds/" }),
+      R("الشيخ عبدالباسط عبدالصمد", "Sceicco Abdul Basit Abdul Samad", "basit", { url: "https://backup.qurango.net/radio/abdulbasitabdulsamad", rid: 53, base: "https://server7.mp3quran.net/basit/" }),
+      R("الشيخ ياسر الدوسري", "Sceicco Yasser Al-Dosari", "yasser", { url: "https://backup.qurango.net/radio/yasseraldosari", rid: 92, base: "https://server11.mp3quran.net/yasser/" }),
+      R("الشيخ محمود خليل الحصري", "Sceicco Mahmoud Khalil Al-Hussary", "husr", { url: "https://backup.qurango.net/radio/mahmoudkhalilalhussary", rid: 118, base: "https://server13.mp3quran.net/husr/" }),
+      R("الشيخ محمد صديق المنشاوي", "Sceicco Mohammed Siddiq Al-Minshawi", "minsh", { url: "https://backup.qurango.net/radio/mohammedsiddiqalminshawi", rid: 112, base: "https://server10.mp3quran.net/minsh/" }),
+      R("الشيخ أحمد العجمي", "Sceicco Ahmad Al-Ajmy", "ajm", { url: "https://backup.qurango.net/radio/ahmadalajmy", rid: 5, base: "https://server10.mp3quran.net/ajm/" }),
+      R("الشيخ محمد محمود الطبلاوي", "Sceicco Mohammed Mahmoud Al-Tablawy", "tblawi", { url: "https://backup.qurango.net/radio/mohammadaltablaway", rid: 106, base: "https://server12.mp3quran.net/tblawi/" }),
       { name: "تلاوات خاشعة", nameIt: "Recitazioni toccanti", tag: "متنوعة", tagIt: "Varie", initial: "📖", url: "https://backup.qurango.net/radio/salma" },
       { name: "سورة البقرة بقراءات متنوعة", nameIt: "Sura Al-Baqarah vari lettori", tag: "خاص", tagIt: "Speciale", initial: "🕋", url: "https://backup.qurango.net/radio/albaqarah" },
-      { name: "الشيخ حسن صالح", nameIt: "Sceicco Hassan Saleh", tag: "مصحف كامل", tagIt: "Corano completo", initial: "📿", server: "server16", code: "hsaleh", list: FULL_LIST, urlBuilder: (num) => `https://server16.mp3quran.net/download/hsalehRewayat-Hafs-A-n-Assem${String(num).padStart(3, '0')}.mp3` }
+      R("الشيخ حسن صالح", "Sceicco Hassan Saleh", "hsaleh", { tag: "مصحف كامل", tagIt: "Corano completo", initial: "📿", find: "حسن صالح" })
     ];
 
+    function normBase(u) {
+      return u.replace(/([^:])\/{2,}/g, '$1/').replace(/\/?$/, '/');
+    }
+
+    let allReciters = null;
+    function resolveStation(s) {
+      if (s.resolving) return s.resolving;
+      if (!s.rid && !s.find) return Promise.resolve();
+      s.resolving = (async () => {
+        try {
+          let rec;
+          if (s.rid) {
+            const r = await fetch(`${MP3Q_API}&reciter=${s.rid}`);
+            if (!r.ok) throw new Error(`status ${r.status}`);
+            rec = ((await r.json()).reciters || [])[0];
+          } else {
+            if (!allReciters) {
+              const r = await fetch(MP3Q_API);
+              if (!r.ok) throw new Error(`status ${r.status}`);
+              allReciters = (await r.json()).reciters || [];
+            }
+            rec = allReciters.find(x => x.name.includes(s.find));
+          }
+          const mo = rec && (rec.moshaf.find(m => m.moshaf_type === 11) || rec.moshaf[0]);
+          if (mo && mo.server) {
+            s.base = normBase(mo.server);
+            const l = String(mo.surah_list || '').split(',').map(Number).filter(Boolean);
+            if (l.length) s.list = l;
+          }
+        } catch (e) {
+          console.warn('resolve', s.code, e);
+        }
+      })();
+      return s.resolving;
+    }
+
     function trackUrl(s, num) {
-      if (s.urlBuilder) return s.urlBuilder(num);
-      return surahUrl(s.server, s.code, num);
+      return `${s.base}${String(num).padStart(3, '0')}.mp3`;
     }
 
     const READ_IDS = { afs: 123, sds: 54, basit: 53, yasser: 92, husr: 118, minsh: 112, ajm: 5, tblawi: 106 };
@@ -963,6 +997,7 @@
 
     audio.preload = 'none';
 
+    let playToken = 0;
     let currentIndex = 0;
     let listPos = 0;
     let usingSurah = false;
@@ -1065,11 +1100,12 @@
       mushafBody.innerHTML = `<div class="mushaf-loading">${TEXTS[currentLang].mushafPlaceholder}</div>`;
 
       const s = stations[i];
+      playToken++;
       if (!s.url && autoplay) { playSurah(i, s.list[0]); return; }
       stationName.textContent = stName(s);
       stationSub.textContent = autoplay ? TEXTS[currentLang].subConnecting : TEXTS[currentLang].subDefault;
 
-      audio.src = s.url || trackUrl(s, s.list[0]);
+      audio.src = s.url || (s.base ? trackUrl(s, s.list[0]) : '');
 
       renderGrid();
 
@@ -1080,10 +1116,20 @@
       }
     }
 
-    function playSurah(i, num) {
+    async function playSurah(i, num) {
+      const s = stations[i];
+      const token = ++playToken;
+      if (!s.base && s.find) {
+        stationName.textContent = `${stName(s)} — ${SURAH_NAMES[num]}`;
+        stationSub.textContent = TEXTS[currentLang].subConnecting;
+        await resolveStation(s);
+        if (token !== playToken) return;
+      }
+      if (!s.base) { stationSub.textContent = TEXTS[currentLang].subErrorSurah; return; }
+      if (s.list.indexOf(num) === -1) num = s.list[0];
+
       currentIndex = i;
       usingSurah = true;
-      const s = stations[i];
       listPos = s.list.indexOf(num);
 
       stationName.textContent = `${stName(s)} — ${SURAH_NAMES[num]}`;
@@ -1209,6 +1255,7 @@
     renderGrid();
     applyLang();
     selectStation(0, false);
+    Promise.all(stations.filter(x => x.rid).map(resolveStation)).then(renderGrid);
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
