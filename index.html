@@ -600,6 +600,7 @@
       transform: scale(1.08);
     }
     .mushaf-body {
+      position: relative;
       max-height: 420px;
       overflow-y: auto;
     }
@@ -619,6 +620,7 @@
       border-inline-start: 3px solid var(--gold);
       box-shadow: 0 0 22px rgba(201,160,80,0.25);
     }
+    .ayah-row.active .italian { color: #fff; }
     .ayah-row.active .arabic {
       color: var(--gold-light);
     }
@@ -955,6 +957,7 @@
     const mushafClose = document.getElementById('mushafClose');
 
     let currentTiming = null;
+    let ayahWeights = [];
     let ayahTimings = [];
     let mushafToken = 0;
     let lastHighlighted = -1;
@@ -963,6 +966,7 @@
       const s = stations[stationIndex];
       const myToken = ++mushafToken;
       currentTiming = null;
+      ayahWeights = [];
       ayahTimings = [];
       lastHighlighted = -1;
 
@@ -998,17 +1002,28 @@
           mushafBody.appendChild(row);
         });
 
-        const readId = READ_IDS[s.code];
+        // تقدير احتياطي: توزيع زمن السورة على الآيات حسب طول النص
+        ayahWeights = arabic.map(a => Math.max(1, a.text.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\s]/g, '').length));
+
+        // توقيت دقيق من mp3quran إن توفر
+        const readId = s.rid || READ_IDS[s.code];
         if (readId) {
-          const timingUrl = `https://mp3quran.net/api/v3/ayah/timing?surah=${surahNum}&read=${readId}`;
           try {
-            const res2 = await fetch(timingUrl);
+            const res2 = await fetch(`https://mp3quran.net/api/v3/ayat_timing?surah=${surahNum}&read=${readId}`);
             if (!res2.ok) throw new Error(`status ${res2.status}`);
-            const timing = await res2.json();
-            if (myToken !== mushafToken) return;
-            currentTiming = Array.isArray(timing) ? timing : null;
+            const raw = await res2.json();
+            const list = (Array.isArray(raw) ? raw : (raw.ayat_timing || raw.data || []))
+              .map(t => ({
+                ayah: Number(t.ayah ?? t.ayah_number),
+                start: Number(t.start_time ?? t.starttime),
+                end: Number(t.end_time ?? t.endtime)
+              }))
+              .filter(t => Number.isFinite(t.ayah) && Number.isFinite(t.start) && Number.isFinite(t.end));
+            // الآية 0 = البسملة، تُعرض ضمن الآية 1
+            list.forEach(t => { if (t.ayah === 0) t.ayah = 1; });
+            if (list.length >= Math.ceil(arabic.length / 2) && myToken === mushafToken) currentTiming = list;
           } catch (e) {
-            console.warn('توقيت الآيات:', e);
+            console.warn('توقيت الآيات (تقدير تلقائي):', e);
           }
         }
       } catch (e) {
@@ -1249,20 +1264,35 @@
       navigator.mediaSession.setActionHandler('pause', () => playBtn.click());
     }
 
-    audio.addEventListener('timeupdate', () => {
-      if (!currentTiming || !usingSurah) return;
-      const ms = audio.currentTime * 1000;
-      const entry = currentTiming.find(t => ms >= t.starttime && ms <= t.endtime);
-      if (entry && entry.ayah !== lastHighlighted) {
-        const prev = document.getElementById(`ayah-${lastHighlighted}`);
-        if (prev) prev.classList.remove('active');
-        const cur = document.getElementById(`ayah-${entry.ayah}`);
-        if (cur) {
-          cur.classList.add('active');
-          cur.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        lastHighlighted = entry.ayah;
+    function highlightAyah(n) {
+      document.querySelectorAll('.ayah-row.active').forEach(el => el.classList.remove('active'));
+      const cur = document.getElementById(`ayah-${n}`);
+      if (cur) {
+        cur.classList.add('active');
+        const top = cur.offsetTop - (mushafBody.clientHeight - cur.offsetHeight) / 2;
+        mushafBody.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
       }
+      lastHighlighted = n;
+    }
+
+    audio.addEventListener('timeupdate', () => {
+      if (!usingSurah) return;
+      let ayah = null;
+      if (currentTiming) {
+        const ms = audio.currentTime * 1000;
+        const e = currentTiming.find(t => ms >= t.start && ms < t.end);
+        if (e) ayah = e.ayah;
+      } else if (ayahWeights.length && isFinite(audio.duration) && audio.duration > 0) {
+        const total = ayahWeights.reduce((x, y) => x + y, 0);
+        const target = (audio.currentTime / audio.duration) * total;
+        let acc = 0;
+        ayah = ayahWeights.length;
+        for (let i = 0; i < ayahWeights.length; i++) {
+          acc += ayahWeights[i];
+          if (target < acc) { ayah = i + 1; break; }
+        }
+      }
+      if (ayah !== null && ayah !== lastHighlighted) highlightAyah(ayah);
     });
 
     mushafClose.addEventListener('click', () => {
