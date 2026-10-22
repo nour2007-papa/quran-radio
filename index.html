@@ -649,10 +649,10 @@
     .ayah-row .italian {
       direction: ltr;
       text-align: left;
-      font-size: 13px;
+      font-size: 17px;
       color: var(--gold-light);
-      margin-top: 6px;
-      line-height: 1.7;
+      margin-top: 8px;
+      line-height: 1.8;
       font-family: Tajawal, sans-serif;
     }
     .mushaf-loading {
@@ -693,6 +693,24 @@
       }
     }
 
+
+    /* === مواقيت الصلاة === */
+    .prayer-section { width: 100%; max-width: 720px; margin-bottom: 22px; }
+    .prayer-card { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; box-shadow: var(--shadow-soft); }
+    .prayer-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .prayer-head .t1 { display: block; font-family: Amiri, serif; font-size: 18px; color: var(--gold-light); font-weight: 700; }
+    .prayer-head .t2 { display: block; font-size: 12px; color: var(--sage); margin-top: 2px; }
+    .prayer-actions { display: flex; gap: 8px; align-items: center; }
+    .prayer-actions select { background: var(--bg-panel-2); color: var(--cream); border: 1px solid var(--line); border-radius: 20px; padding: 6px 10px; font-family: Tajawal, sans-serif; font-size: 13px; }
+    .prayer-next { font-size: 15px; color: var(--cream); margin-bottom: 12px; min-height: 22px; }
+    .prayer-next b { color: var(--gold-light); }
+    .prayer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 8px; }
+    .prayer-item { text-align: center; padding: 10px 4px; border-radius: 12px; background: rgba(243,236,218,0.04); border: 1px solid transparent; }
+    .prayer-item .pn { font-size: 13px; color: var(--sage); }
+    .prayer-item .pt { font-size: 20px; font-weight: 700; color: var(--cream); direction: ltr; margin-top: 2px; }
+    .prayer-item.next { border-color: var(--gold); background: rgba(201,160,80,0.14); }
+    .prayer-item.next .pn, .prayer-item.next .pt { color: var(--gold-light); }
+    .prayer-note { font-size: 11px; color: var(--sage); margin-top: 10px; opacity: 0.8; }
     :focus-visible { outline: 2px solid var(--gold-light); outline-offset: 3px; border-radius: 8px; }
     .surah-chip, .card-top .txt { -webkit-tap-highlight-color: transparent; }
     noscript p { text-align:center; color: var(--gold-light); }
@@ -713,6 +731,24 @@
     <div class="eyebrow" id="eyebrowText">بث مباشر 24/7</div>
     <h1 id="pageTitle">إذاعة القرآن الكريم</h1>
   </header>
+
+  <section class="prayer-section">
+    <div class="prayer-card">
+      <div class="prayer-head">
+        <div>
+          <span class="t1" id="prayerTitle">مواقيت الصلاة</span>
+          <span class="t2" id="prayerPlace"></span>
+        </div>
+        <div class="prayer-actions">
+          <select id="prayerCity" aria-label="city"></select>
+          <button class="lang-toggle" id="prayerLocBtn" type="button">📍</button>
+        </div>
+      </div>
+      <div class="prayer-next" id="prayerNext"></div>
+      <div class="prayer-grid" id="prayerGrid"></div>
+      <div class="prayer-note" id="prayerNote"></div>
+    </div>
+  </section>
 
   <section class="stage">
     <div class="star-wrap">
@@ -941,6 +977,7 @@
       document.getElementById('mushafSub').textContent = t.mushafSub;
       document.getElementById('footerText').innerHTML = t.footer1 + (t.footer2 ? `<br>${t.footer2}` : '');
       document.getElementById('langToggle').textContent = t.langBtn;
+      if (typeof renderPrayer === 'function') renderPrayer();
 
       if (mushafBody && !mushafBody.querySelector('.mushaf-loading') && !mushafBody.querySelector('.ayah-row')) {
         mushafBody.innerHTML = `<div class="mushaf-loading">${t.mushafPlaceholder}</div>`;
@@ -1306,9 +1343,157 @@
       if (typeof renderGrid === 'function') renderGrid();
     });
 
+
+    // === مواقيت الصلاة (Aladhan API) ===
+    const PT = {
+      ar: { title: 'مواقيت الصلاة', next: 'الصلاة القادمة', inn: 'بعد', h: 'س', m: 'د', loading: 'جاري التحميل...', error: 'تعذر تحميل المواقيت',
+            mine: 'موقعي الحالي', denied: 'تعذر تحديد الموقع، اختر مدينتك', btn: 'تحديد موقعي',
+            note: 'الحساب: رابطة العالم الإسلامي — قد يختلف دقائق قليلة عن مسجدك',
+            names: { Fajr: 'الفجر', Sunrise: 'الشروق', Dhuhr: 'الظهر', Asr: 'العصر', Maghrib: 'المغرب', Isha: 'العشاء' } },
+      it: { title: 'Orari di preghiera', next: 'Prossima preghiera', inn: 'tra', h: 'h', m: 'm', loading: 'Caricamento...', error: 'Impossibile caricare gli orari',
+            mine: 'La mia posizione', denied: 'Posizione non disponibile, scegli la città', btn: 'Rileva posizione',
+            note: 'Calcolo: Lega Mondiale Musulmana — può differire di qualche minuto dalla tua moschea',
+            names: { Fajr: 'Fajr', Sunrise: 'Alba', Dhuhr: 'Dhuhr', Asr: 'Asr', Maghrib: 'Maghrib', Isha: 'Isha' } }
+    };
+    const CITIES = [
+      { id: 'milano', ar: 'ميلانو', it: 'Milano', lat: 45.4642, lon: 9.19 },
+      { id: 'roma', ar: 'روما', it: 'Roma', lat: 41.9028, lon: 12.4964 },
+      { id: 'torino', ar: 'تورينو', it: 'Torino', lat: 45.0703, lon: 7.6869 },
+      { id: 'napoli', ar: 'نابولي', it: 'Napoli', lat: 40.8518, lon: 14.2681 },
+      { id: 'bologna', ar: 'بولونيا', it: 'Bologna', lat: 44.4949, lon: 11.3426 },
+      { id: 'firenze', ar: 'فلورنسا', it: 'Firenze', lat: 43.7696, lon: 11.2558 },
+      { id: 'genova', ar: 'جنوا', it: 'Genova', lat: 44.4056, lon: 8.9463 },
+      { id: 'venezia', ar: 'البندقية', it: 'Venezia', lat: 45.4408, lon: 12.3155 },
+      { id: 'bergamo', ar: 'برغامو', it: 'Bergamo', lat: 45.6983, lon: 9.6773 },
+      { id: 'brescia', ar: 'بريشيا', it: 'Brescia', lat: 45.5416, lon: 10.2118 },
+      { id: 'palermo', ar: 'باليرمو', it: 'Palermo', lat: 38.1157, lon: 13.3615 }
+    ];
+    const PRAYERS = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+    let ploc = { type: 'city', id: 'milano' };
+    let ptimes = null;
+    try { const sv = JSON.parse(localStorage.getItem('ploc')); if (sv && sv.type) ploc = sv; } catch (e) {}
+
+    function currentLoc() {
+      if (ploc.type === 'geo') {
+        return { lat: ploc.lat, lon: ploc.lon, tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Rome', geo: true };
+      }
+      const c = CITIES.find(x => x.id === ploc.id) || CITIES[0];
+      return { lat: c.lat, lon: c.lon, tz: 'Europe/Rome', city: c };
+    }
+    function tzNow(tz) {
+      const o = {};
+      new Intl.DateTimeFormat('en-GB', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
+        .formatToParts(new Date()).forEach(p => { o[p.type] = p.value; });
+      return { date: `${o.day}-${o.month}-${o.year}`, sec: (Number(o.hour) % 24) * 3600 + Number(o.minute) * 60 + Number(o.second) };
+    }
+    function toSec(str) {
+      const m = String(str).match(/(\d{1,2}):(\d{2})/);
+      return m ? Number(m[1]) * 3600 + Number(m[2]) * 60 : 0;
+    }
+    function hhmm(str) {
+      const m = String(str).match(/(\d{1,2}):(\d{2})/);
+      return m ? `${m[1].padStart(2, '0')}:${m[2]}` : '--:--';
+    }
+    function savePloc() { try { localStorage.setItem('ploc', JSON.stringify(ploc)); } catch (e) {} }
+
+    function renderCitySelect() {
+      const sel = document.getElementById('prayerCity');
+      const t = PT[currentLang];
+      sel.innerHTML = '';
+      if (ploc.type === 'geo') {
+        const o = document.createElement('option');
+        o.value = 'geo'; o.textContent = `📍 ${t.mine}`;
+        sel.appendChild(o);
+      }
+      CITIES.forEach(c => {
+        const o = document.createElement('option');
+        o.value = c.id; o.textContent = currentLang === 'ar' ? c.ar : c.it;
+        sel.appendChild(o);
+      });
+      sel.value = ploc.type === 'geo' ? 'geo' : ploc.id;
+      document.getElementById('prayerLocBtn').setAttribute('aria-label', t.btn);
+      document.getElementById('prayerLocBtn').title = t.btn;
+    }
+
+    function renderPrayer() {
+      const t = PT[currentLang];
+      document.getElementById('prayerTitle').textContent = t.title;
+      document.getElementById('prayerNote').textContent = t.note;
+      renderCitySelect();
+      const loc = currentLoc();
+      document.getElementById('prayerPlace').textContent = loc.geo ? t.mine : (currentLang === 'ar' ? loc.city.ar : loc.city.it);
+      const grid = document.getElementById('prayerGrid');
+      const nextEl = document.getElementById('prayerNext');
+      if (!ptimes) { return; }
+
+      const now = tzNow(loc.tz).sec;
+      const five = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+      let next = five.find(k => toSec(ptimes.t[k]) > now);
+      let diff;
+      if (next) diff = toSec(ptimes.t[next]) - now;
+      else { next = 'Fajr'; diff = 86400 - now + toSec(ptimes.t.Fajr); }
+      const hh = Math.floor(diff / 3600), mm = Math.floor((diff % 3600) / 60);
+      nextEl.innerHTML = `${t.next}: <b>${t.names[next]}</b> ${t.inn} ${hh ? hh + t.h + ' ' : ''}${mm}${t.m}`;
+
+      grid.innerHTML = '';
+      PRAYERS.forEach(k => {
+        const d = document.createElement('div');
+        d.className = `prayer-item${k === next ? ' next' : ''}`;
+        const pn = document.createElement('div'); pn.className = 'pn'; pn.textContent = t.names[k];
+        const pt = document.createElement('div'); pt.className = 'pt'; pt.textContent = hhmm(ptimes.t[k]);
+        d.append(pn, pt);
+        grid.appendChild(d);
+      });
+    }
+
+    async function loadPrayer() {
+      const t = PT[currentLang];
+      const loc = currentLoc();
+      const now = tzNow(loc.tz);
+      const key = `pt:${loc.lat.toFixed(2)},${loc.lon.toFixed(2)}:${now.date}`;
+      let times = null;
+      try { times = JSON.parse(localStorage.getItem(key)); } catch (e) {}
+      if (!times) {
+        document.getElementById('prayerNext').textContent = t.loading;
+        try {
+          const r = await fetch(`https://api.aladhan.com/v1/timings/${now.date}?latitude=${loc.lat}&longitude=${loc.lon}&method=3`);
+          if (!r.ok) throw new Error(`status ${r.status}`);
+          times = (await r.json()).data.timings;
+          try { localStorage.setItem(key, JSON.stringify(times)); } catch (e) {}
+        } catch (e) {
+          console.warn('prayer', e);
+          document.getElementById('prayerNext').textContent = t.error;
+          return;
+        }
+      }
+      ptimes = { t: times, date: now.date };
+      renderPrayer();
+    }
+
+    document.getElementById('prayerCity').addEventListener('change', (e) => {
+      if (e.target.value === 'geo') return;
+      ploc = { type: 'city', id: e.target.value };
+      savePloc(); ptimes = null; loadPrayer();
+    });
+    document.getElementById('prayerLocBtn').addEventListener('click', () => {
+      if (!navigator.geolocation) { document.getElementById('prayerNext').textContent = PT[currentLang].denied; return; }
+      navigator.geolocation.getCurrentPosition((pos) => {
+        ploc = { type: 'geo', lat: pos.coords.latitude, lon: pos.coords.longitude };
+        savePloc(); ptimes = null; loadPrayer();
+      }, () => {
+        document.getElementById('prayerNext').textContent = PT[currentLang].denied;
+      }, { timeout: 10000, maximumAge: 3600000 });
+    });
+    setInterval(() => {
+      if (!ptimes) return;
+      if (tzNow(currentLoc().tz).date !== ptimes.date) loadPrayer(); else renderPrayer();
+    }, 30000);
+
     renderGrid();
     applyLang();
     selectStation(0, false);
+    renderCitySelect();
+    loadPrayer();
     Promise.all(stations.filter(x => x.rid).map(resolveStation)).then(renderGrid);
     setTimeout(() => {
       Promise.all(stations.filter(x => x.find).map(resolveStation)).then(renderGrid);
