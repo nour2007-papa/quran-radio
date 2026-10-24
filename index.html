@@ -1281,10 +1281,15 @@
     });
 
     let retries = 0;
+    let listenTracked = false;
     audio.addEventListener('playing', () => {
       retries = 0;
       setPlayingUI(true);
       updateMediaSession();
+      if (!listenTracked && typeof gtag === 'function') {
+        listenTracked = true;
+        gtag('event', 'listen_start', { mode: usingSurah ? 'surah' : 'live' });
+      }
     });
 
     audio.addEventListener('error', () => {
