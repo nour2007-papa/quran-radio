@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://sacrocorano.wuaze.com/sitemap.xml
