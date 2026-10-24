@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sacrocorano.wuaze.com/sitemap.xml
+Sitemap: https://quran-radio-vert.vercel.app/sitemap.xml
