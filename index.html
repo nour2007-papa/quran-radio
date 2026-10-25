@@ -722,6 +722,7 @@
     :focus-visible { outline: 2px solid var(--gold-light); outline-offset: 3px; border-radius: 8px; }
     .surah-chip, .card-top .txt { -webkit-tap-highlight-color: transparent; }
     noscript p { text-align:center; color: var(--gold-light); }
+
   </style>
   <!-- Google Analytics 4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-PKH4THLV0Y"></script>
@@ -842,6 +843,10 @@
 
   <script>
     const SURAH_NAMES = ["", "الفاتحة", "البقرة", "آل عمران", "النساء", "المائدة", "الأنعام", "الأعراف", "الأنفال", "التوبة", "يونس", "هود", "يوسف", "الرعد", "إبراهيم", "الحجر", "النحل", "الإسراء", "الكهف", "مريم", "طه", "الأنبياء", "الحج", "المؤمنون", "النور", "الفرقان", "الشعراء", "النمل", "القصص", "العنكبوت", "الروم", "لقمان", "السجدة", "الأحزاب", "سبأ", "فاطر", "يس", "الصافات", "ص", "الزمر", "غافر", "فصلت", "الشورى", "الزخرف", "الدخان", "الجاثية", "الأحقاف", "محمد", "الفتح", "الحجرات", "ق", "الذاريات", "الطور", "النجم", "القمر", "الرحمن", "الواقعة", "الحديد", "المجادلة", "الحشر", "الممتحنة", "الصف", "الجمعة", "المنافقون", "التغابن", "الطلاق", "التحريم", "الملك", "القلم", "الحاقة", "المعارج", "نوح", "الجن", "المزمل", "المدثر", "القيامة", "الإنسان", "المرسلات", "النبأ", "النازعات", "عبس", "التكوير", "الإنفطار", "المطففين", "الإنشقاق", "البروج", "الطارق", "الأعلى", "الغاشية", "الفجر", "البلد", "الشمس", "الليل", "الضحى", "الشرح", "التين", "العلق", "القدر", "البينة", "الزلزلة", "العاديات", "القارعة", "التكاثر", "العصر", "الهمزة", "الفيل", "قريش", "الماعون", "الكوثر", "الكافرون", "النصر", "المسد", "الإخلاص", "الفلق", "الناس"];
+    const SURAH_NAMES_IT = ["", "Al-Fatiha", "Al-Baqara", "Al-Imran", "An-Nisa", "Al-Ma'ida", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawba", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Ash-Shu'ara", "An-Naml", "Al-Qasas", "Al-'Ankabut", "Ar-Rum", "Luqman", "As-Sajda", "Al-Ahzab", "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila", "Al-Hashr", "Al-Mumtahana", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqa", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddaththir", "Al-Qiyama", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "'Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Ghashiya", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Layl", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-'Alaq", "Al-Qadr", "Al-Bayyina", "Az-Zalzala", "Al-'Adiyat", "Al-Qari'a", "At-Takathur", "Al-'Asr", "Al-Humaza", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"];
+    function surahName(n) {
+      return (currentLang === 'it' ? SURAH_NAMES_IT[n] : SURAH_NAMES[n]) || '';
+    }
 
     const FULL_LIST = Array.from({ length: 114 }, (_, i) => i + 1);
 
@@ -860,6 +865,7 @@
       R("الشيخ عبدالباسط عبدالصمد", "Sceicco Abdul Basit Abdul Samad", "basit", { url: "https://backup.qurango.net/radio/abdulbasitabdulsamad", rid: 53, base: "https://server7.mp3quran.net/basit/" }),
       R("الشيخ ياسر الدوسري", "Sceicco Yasser Al-Dosari", "yasser", { url: "https://backup.qurango.net/radio/yasseraldosari", rid: 92, base: "https://server11.mp3quran.net/yasser/" }),
       R("الشيخ محمود خليل الحصري", "Sceicco Mahmoud Khalil Al-Hussary", "husr", { url: "https://backup.qurango.net/radio/mahmoudkhalilalhussary", rid: 118, base: "https://server13.mp3quran.net/husr/" }),
+      R("الشيخ الحصري — المصحف المعلم", "Sceicco Al-Hussary — Mushaf Al-Muallim", "muallim", { tag: "المصحف المعلم", tagIt: "Mushaf Al-Muallim", initial: "📚", base: "https://download.quranicaudio.com/qdc/khalil_al_husary/muallim/", noPad: true }),
       R("الشيخ محمد صديق المنشاوي", "Sceicco Mohammed Siddiq Al-Minshawi", "minsh", { url: "https://backup.qurango.net/radio/mohammedsiddiqalminshawi", rid: 112, base: "https://server10.mp3quran.net/minsh/" }),
       R("الشيخ أحمد العجمي", "Sceicco Ahmad Al-Ajmy", "ajm", { url: "https://backup.qurango.net/radio/ahmadalajmy", rid: 5, base: "https://server10.mp3quran.net/ajm/" }),
       R("الشيخ محمد محمود الطبلاوي", "Sceicco Mohammed Mahmoud Al-Tablawy", "tblawi", { url: "https://backup.qurango.net/radio/mohammadaltablaway", rid: 106, base: "https://server12.mp3quran.net/tblawi/" }),
@@ -928,7 +934,7 @@
     }
 
     function trackUrl(s, num) {
-      return `${s.base}${String(num).padStart(3, '0')}.mp3`;
+      return `${s.base}${s.noPad ? num : String(num).padStart(3, '0')}.mp3`;
     }
 
     const READ_IDS = { afs: 123, sds: 54, basit: 53, yasser: 92, husr: 118, minsh: 112, ajm: 5, tblawi: 106 };
@@ -1025,7 +1031,7 @@
       lastHighlighted = -1;
 
       mushafSection.style.display = 'block';
-      mushafTitle.textContent = `${SURAH_NAMES[surahNum]} — ${currentLang === 'ar' ? s.name : s.nameIt}`;
+      mushafTitle.textContent = `${surahName(surahNum)} — ${currentLang === 'ar' ? s.name : s.nameIt}`;
       mushafBody.innerHTML = `<div class="mushaf-loading">${TEXTS[currentLang].mushafLoading}</div>`;
 
       try {
@@ -1169,7 +1175,7 @@
             const chip = document.createElement('div');
             const isActive = i === currentIndex && usingSurah && s.list[listPos] === num;
             chip.className = `surah-chip${isActive ? ' active' : ''}`;
-            chip.textContent = SURAH_NAMES[num];
+            chip.textContent = surahName(num);
             onActivate(chip, (e) => {
               e.stopPropagation();
               playSurah(i, num);
@@ -1213,7 +1219,7 @@
       const s = stations[i];
       const token = ++playToken;
       if (!s.base && s.find) {
-        stationName.textContent = `${stName(s)} — ${SURAH_NAMES[num]}`;
+        stationName.textContent = `${stName(s)} — ${surahName(num)}`;
         stationSub.textContent = TEXTS[currentLang].subConnecting;
         await resolveStation(s);
         if (token !== playToken) return;
@@ -1225,7 +1231,7 @@
       usingSurah = true;
       listPos = s.list.indexOf(num);
 
-      stationName.textContent = `${stName(s)} — ${SURAH_NAMES[num]}`;
+      stationName.textContent = `${stName(s)} — ${surahName(num)}`;
       stationSub.textContent = TEXTS[currentLang].subConnecting;
 
       audio.src = trackUrl(s, num);
@@ -1242,7 +1248,7 @@
       if (usingSurah && s.list) {
         listPos = (listPos + 1) % s.list.length;
         const num = s.list[listPos];
-        stationName.textContent = `${stName(s)} — ${SURAH_NAMES[num]}`;
+        stationName.textContent = `${stName(s)} — ${surahName(num)}`;
         audio.src = trackUrl(s, num);
         audio.play().catch(() => {});
         loadMushaf(currentIndex, num);
@@ -1363,7 +1369,20 @@
       try { localStorage.setItem('lang', currentLang); } catch (e) {}
       applyLang();
       if (typeof renderGrid === 'function') renderGrid();
+      refreshNowPlaying();
     });
+
+    function refreshNowPlaying() {
+      const s = stations[currentIndex];
+      if (!s || !audio.src) return;
+      if (usingSurah && s.list) {
+        const num = s.list[listPos];
+        stationName.textContent = `${stName(s)} — ${surahName(num)}`;
+        if (mushafBody.querySelector('.ayah-row')) mushafTitle.textContent = `${surahName(num)} — ${stName(s)}`;
+      } else {
+        stationName.textContent = stName(s);
+      }
+    }
 
 
     // === مواقيت الصلاة (Aladhan API) ===
