@@ -718,22 +718,43 @@
     .prayer-item .pt { font-size: 20px; font-weight: 700; color: var(--cream); direction: ltr; margin-top: 2px; }
     .prayer-item.next { border-color: var(--gold); background: rgba(201,160,80,0.14); }
     .prayer-item.next .pn, .prayer-item.next .pt { color: var(--gold-light); }
+    .adhan-toggle { display: flex; align-items: center; gap: 8px; margin-top: 12px; background: transparent; border: 1px solid var(--line); border-radius: 20px; padding: 8px 14px; color: var(--cream); font-family: Tajawal, sans-serif; font-size: 13px; cursor: pointer; }
+    .adhan-toggle .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--sage); opacity: 0.5; }
+    .adhan-toggle[aria-checked="true"] { border-color: var(--gold); }
+    .adhan-toggle[aria-checked="true"] .dot { background: var(--gold); opacity: 1; }
+    .surah-search { display: block; width: 100%; box-sizing: border-box; background: var(--bg-panel-2); color: var(--cream); border: 1px solid var(--line); border-radius: 20px; padding: 10px 16px; font-family: Tajawal, sans-serif; font-size: 14px; margin: 0 0 14px; }
+    .prayer-actions select + select { max-width: 150px; }
+    .consent-bar { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 50; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; background: var(--bg-panel-2); border: 1px solid var(--gold); border-radius: 14px; padding: 12px 14px; font-size: 13px; color: var(--cream); }
+    .consent-bar[hidden] { display: none; }
+    .consent-bar button { background: transparent; border: 1px solid var(--gold); color: var(--gold-light); border-radius: 20px; padding: 6px 14px; font-family: Tajawal, sans-serif; font-size: 13px; cursor: pointer; margin-inline-start: 6px; }
     .prayer-note { font-size: 11px; color: var(--sage); margin-top: 10px; opacity: 0.8; }
     :focus-visible { outline: 2px solid var(--gold-light); outline-offset: 3px; border-radius: 8px; }
     .surah-chip, .card-top .txt { -webkit-tap-highlight-color: transparent; }
     noscript p { text-align:center; color: var(--gold-light); }
 
   </style>
-  <!-- Google Analytics 4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PKH4THLV0Y"></script>
+  <!-- Google Analytics 4: يتحمّل فقط بعد موافقة المستخدم -->
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-PKH4THLV0Y');
+    (function () {
+      var GA_ID = 'G-PKH4THLV0Y';
+      window.__loadGA = function () {
+        if (window.__gaLoaded) return;
+        window.__gaLoaded = true;
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { dataLayer.push(arguments); };
+        gtag('js', new Date());
+        gtag('config', GA_ID, { anonymize_ip: true });
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+        document.head.appendChild(s);
+      };
+      try { if (localStorage.getItem('gaConsent') === 'yes') window.__loadGA(); } catch (e) {}
+    })();
   </script>
 </head>
 <body>
+  <div class="consent-bar" id="consentBar" role="dialog" aria-live="polite" hidden><span id="consentText"></span><span><button type="button" id="consentYes"></button><button type="button" id="consentNo"></button></span></div>
   <noscript><p>يتطلب هذا الموقع تفعيل جافاسكربت · Questo sito richiede JavaScript.</p></noscript>
   <div class="top-band">
     <div class="rule"></div>
@@ -758,11 +779,13 @@
         </div>
         <div class="prayer-actions">
           <select id="prayerCity" aria-label="city"></select>
+          <select id="prayerMethod" aria-label="method"></select>
           <button class="lang-toggle" id="prayerLocBtn" type="button">📍</button>
         </div>
       </div>
       <div class="prayer-next" id="prayerNext"></div>
       <div class="prayer-grid" id="prayerGrid"></div>
+      <button type="button" class="adhan-toggle" id="adhanToggle" role="switch" aria-checked="true"><span class="dot"></span><span id="adhanLabel"></span></button>
       <div class="prayer-note" id="prayerNote"></div>
     </div>
   </section>
@@ -810,6 +833,7 @@
         <path d="M15.5 8.5a5 5 0 010 7"/>
       </svg>
       <input type="range" id="volume" min="0" max="1" step="0.01" value="0.9">
+      <button type="button" class="lang-toggle" id="sleepBtn" style="white-space:nowrap"></button>
     </div>
   </section>
 
@@ -833,6 +857,7 @@
       <span id="listHeadingText">اختر القارئ أو الإذاعة</span>
       <div class="rule"></div>
     </div>
+    <input type="search" class="surah-search" id="surahSearch" autocomplete="off">
     <div class="station-grid" id="stationGrid"></div>
   </section>
 
@@ -997,6 +1022,9 @@
       document.getElementById('pageTitle').textContent = t.title;
       document.getElementById('liveTagText').textContent = t.live;
       document.getElementById('listHeadingText').textContent = t.listHeading;
+      document.getElementById('surahSearch').placeholder = currentLang === 'ar' ? 'ابحث عن سورة أو قارئ' : 'Cerca una sura o un lettore';
+      if (typeof renderSleep === 'function') renderSleep();
+      if (typeof renderConsent === 'function') renderConsent();
       document.getElementById('mushafSub').textContent = t.mushafSub;
       document.getElementById('footerText').innerHTML = t.footer1 + (t.footer2 ? `<br>${t.footer2}` : '');
       document.getElementById('langToggle').textContent = t.langBtn;
@@ -1102,6 +1130,7 @@
     let openIndex = -1;
 
     const grid = document.getElementById('stationGrid');
+    const surahSearch = document.getElementById('surahSearch');
     const playBtn = document.getElementById('playBtn');
     const playIcon = document.getElementById('playIcon');
     const pauseIcon = document.getElementById('pauseIcon');
@@ -1131,8 +1160,15 @@
 
     function renderGrid() {
       grid.innerHTML = '';
+      const q = normSearch(surahSearch.value || '');
       stations.forEach((s, i) => {
         if (s.done && !s.base && !s.url) return;
+        let shown = s.list || null;
+        if (q) {
+          const byName = normSearch(s.name).indexOf(q) >= 0 || normSearch(s.nameIt).indexOf(q) >= 0;
+          if (!byName) shown = s.list ? s.list.filter(n => normSearch(SURAH_NAMES[n]).indexOf(q) >= 0 || normSearch(SURAH_NAMES_IT[n]).indexOf(q) >= 0 || String(n) === q) : null;
+          if (!byName && (!shown || !shown.length)) return;
+        }
         const card = document.createElement('div');
         card.className = `station-card${i === currentIndex ? ' active' : ''}`;
 
@@ -1153,7 +1189,7 @@
 
         if (s.list) {
           const btn = document.createElement('button');
-          btn.className = `expand-btn${openIndex === i ? ' open' : ''}`;
+          btn.className = `expand-btn${(openIndex === i || q) ? ' open' : ''}`;
           btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>`;
           btn.setAttribute('aria-label', currentLang === 'ar' ? 'عرض السور' : 'Mostra sure');
           btn.addEventListener('click', (e) => {
@@ -1168,10 +1204,10 @@
 
         if (s.list) {
           const panel = document.createElement('div');
-          panel.className = `surah-panel${openIndex === i ? ' open' : ''}`;
+          panel.className = `surah-panel${(openIndex === i || q) ? ' open' : ''}`;
           const list = document.createElement('div');
           list.className = 'surah-list';
-          s.list.forEach(num => {
+          shown.forEach(num => {
             const chip = document.createElement('div');
             const isActive = i === currentIndex && usingSurah && s.list[listPos] === num;
             chip.className = `surah-chip${isActive ? ' active' : ''}`;
@@ -1192,6 +1228,7 @@
 
     function selectStation(i, autoplay) {
       currentIndex = i;
+      if (autoplay) saveLast(i, 0);
       usingSurah = false;
       listPos = 0;
       currentTiming = null;
@@ -1230,6 +1267,7 @@
       currentIndex = i;
       usingSurah = true;
       listPos = s.list.indexOf(num);
+      saveLast(i, num);
 
       stationName.textContent = `${stName(s)} — ${surahName(num)}`;
       stationSub.textContent = TEXTS[currentLang].subConnecting;
@@ -1271,6 +1309,7 @@
     }
 
     playBtn.addEventListener('click', () => {
+      if (adhanActive) { endAdhan(true); return; }
       if (!audio.src) {
         selectStation(currentIndex, true);
         return;
@@ -1389,11 +1428,13 @@
     const PT = {
       ar: { title: 'مواقيت الصلاة', next: 'الصلاة القادمة', inn: 'بعد', h: 'س', m: 'د', loading: 'جاري التحميل...', error: 'تعذر تحميل المواقيت',
             mine: 'موقعي الحالي', denied: 'تعذر تحديد الموقع، اختر مدينتك', btn: 'تحديد موقعي',
-            note: 'الحساب: رابطة العالم الإسلامي — قد يختلف دقائق قليلة عن مسجدك',
+            note: 'الحساب: {m} — قد يختلف دقائق قليلة عن مسجدك',
+            adhan: 'تشغيل الأذان وإيقاف التلاوة وقت الصلاة', adhanNow: 'أذان',
             names: { Fajr: 'الفجر', Sunrise: 'الشروق', Dhuhr: 'الظهر', Asr: 'العصر', Maghrib: 'المغرب', Isha: 'العشاء' } },
       it: { title: 'Orari di preghiera', next: 'Prossima preghiera', inn: 'tra', h: 'h', m: 'm', loading: 'Caricamento...', error: 'Impossibile caricare gli orari',
             mine: 'La mia posizione', denied: 'Posizione non disponibile, scegli la città', btn: 'Rileva posizione',
-            note: 'Calcolo: Lega Mondiale Musulmana — può differire di qualche minuto dalla tua moschea',
+            note: 'Calcolo: {m} — può differire di qualche minuto dalla tua moschea',
+            adhan: "Adhan all'orario di preghiera (la recitazione si ferma)", adhanNow: 'Adhan',
             names: { Fajr: 'Fajr', Sunrise: 'Alba', Dhuhr: 'Dhuhr', Asr: 'Asr', Maghrib: 'Maghrib', Isha: 'Isha' } }
     };
     const CITIES = [
@@ -1409,6 +1450,14 @@
       { id: 'brescia', ar: 'بريشيا', it: 'Brescia', lat: 45.5416, lon: 10.2118 },
       { id: 'palermo', ar: 'باليرمو', it: 'Palermo', lat: 38.1157, lon: 13.3615 }
     ];
+    const METHODS = [
+      { id: 3, ar: 'رابطة العالم الإسلامي', it: 'Lega Mondiale Musulmana' },
+      { id: 5, ar: 'الهيئة المصرية العامة للمساحة', it: 'Autorità Generale Egiziana' },
+      { id: 4, ar: 'جامعة أم القرى', it: 'Umm al-Qura' },
+      { id: 2, ar: 'أمريكا الشمالية (ISNA)', it: 'Nord America (ISNA)' }
+    ];
+    let pmethod = 3;
+    try { const sv = Number(localStorage.getItem('pmethod')); if (METHODS.some(m => m.id === sv)) pmethod = sv; } catch (e) {}
     const PRAYERS = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
     let ploc = { type: 'city', id: 'milano' };
     let ptimes = null;
@@ -1452,6 +1501,10 @@
         sel.appendChild(o);
       });
       sel.value = ploc.type === 'geo' ? 'geo' : ploc.id;
+      const ms = document.getElementById('prayerMethod');
+      ms.innerHTML = '';
+      METHODS.forEach(m => { const o = document.createElement('option'); o.value = m.id; o.textContent = m[currentLang]; ms.appendChild(o); });
+      ms.value = pmethod;
       document.getElementById('prayerLocBtn').setAttribute('aria-label', t.btn);
       document.getElementById('prayerLocBtn').title = t.btn;
     }
@@ -1459,8 +1512,9 @@
     function renderPrayer() {
       const t = PT[currentLang];
       document.getElementById('prayerTitle').textContent = t.title;
-      document.getElementById('prayerNote').textContent = t.note;
+      document.getElementById('prayerNote').textContent = t.note.replace('{m}', (METHODS.find(x => x.id === pmethod) || METHODS[0])[currentLang]);
       renderCitySelect();
+      document.getElementById('adhanLabel').textContent = t.adhan;
       const loc = currentLoc();
       document.getElementById('prayerPlace').textContent = loc.geo ? t.mine : (currentLang === 'ar' ? loc.city.ar : loc.city.it);
       const grid = document.getElementById('prayerGrid');
@@ -1475,6 +1529,7 @@
       else { next = 'Fajr'; diff = 86400 - now + toSec(ptimes.t.Fajr); }
       const hh = Math.floor(diff / 3600), mm = Math.floor((diff % 3600) / 60);
       nextEl.innerHTML = `${t.next}: <b>${t.names[next]}</b> ${t.inn} ${hh ? hh + t.h + ' ' : ''}${mm}${t.m}`;
+      document.title = `${t.names[next]} ${t.inn} ${hh ? hh + t.h + ' ' : ''}${mm}${t.m} — ${TEXTS[currentLang].title}`;
 
       grid.innerHTML = '';
       PRAYERS.forEach(k => {
@@ -1491,13 +1546,13 @@
       const t = PT[currentLang];
       const loc = currentLoc();
       const now = tzNow(loc.tz);
-      const key = `pt:${loc.lat.toFixed(2)},${loc.lon.toFixed(2)}:${now.date}`;
+      const key = `pt:${loc.lat.toFixed(2)},${loc.lon.toFixed(2)}:${now.date}:m${pmethod}`;
       let times = null;
       try { times = JSON.parse(localStorage.getItem(key)); } catch (e) {}
       if (!times) {
         document.getElementById('prayerNext').textContent = t.loading;
         try {
-          const r = await fetch(`https://api.aladhan.com/v1/timings/${now.date}?latitude=${loc.lat}&longitude=${loc.lon}&method=3`);
+          const r = await fetch(`https://api.aladhan.com/v1/timings/${now.date}?latitude=${loc.lat}&longitude=${loc.lon}&method=${pmethod}`);
           if (!r.ok) throw new Error(`status ${r.status}`);
           times = (await r.json()).data.timings;
           try { localStorage.setItem(key, JSON.stringify(times)); } catch (e) {}
@@ -1516,6 +1571,11 @@
       ploc = { type: 'city', id: e.target.value };
       savePloc(); ptimes = null; loadPrayer();
     });
+    document.getElementById('prayerMethod').addEventListener('change', (e) => {
+      pmethod = Number(e.target.value);
+      try { localStorage.setItem('pmethod', String(pmethod)); } catch (x) {}
+      ptimes = null; loadPrayer();
+    });
     document.getElementById('prayerLocBtn').addEventListener('click', () => {
       if (!navigator.geolocation) { document.getElementById('prayerNext').textContent = PT[currentLang].denied; return; }
       navigator.geolocation.getCurrentPosition((pos) => {
@@ -1530,9 +1590,158 @@
       if (tzNow(currentLoc().tz).date !== ptimes.date) loadPrayer(); else renderPrayer();
     }, 30000);
 
+    // === الأذان وقت الصلاة: يوقف التلاوة ثم يكملها بعد انتهاء الأذان ===
+    // روابط أونلاين بالترتيب؛ لو الأول فشل بيجرّب التاني. بدّلها بأي رابط mp3 تفضّله.
+    const ADHAN_URLS = [
+      'adhan.mp3', // ملف محلي: حطه جنب index.html (الأولوية له)
+      'https://praytimes.org/audio/adhan/Sunni/Adhan-Makkah.mp3',
+      'https://cdn.aladhan.com/audio/adhans/a1.mp3'
+    ];
+    const adhanAudio = new Audio();
+    adhanAudio.preload = 'none';
+    const adhanToggle = document.getElementById('adhanToggle');
+    let adhanOn = true;
+    try { adhanOn = localStorage.getItem('adhanOn') !== '0'; } catch (e) {}
+    adhanToggle.setAttribute('aria-checked', adhanOn ? 'true' : 'false');
+    adhanToggle.addEventListener('click', () => {
+      adhanOn = !adhanOn;
+      adhanToggle.setAttribute('aria-checked', adhanOn ? 'true' : 'false');
+      try { localStorage.setItem('adhanOn', adhanOn ? '1' : '0'); } catch (e) {}
+      if (!adhanOn && adhanActive) endAdhan(true);
+    });
+
+    let adhanActive = false, adhanResume = false, adhanIdx = 0;
+    const adhanDone = {};
+    let adhanQueue = ADHAN_URLS;
+
+    function startAdhan(k) {
+      adhanActive = true;
+      adhanResume = !audio.paused;
+      if (adhanResume) audio.pause();
+      setPlayingUI(false);
+      stationSub.textContent = `${PT[currentLang].adhanNow} — ${PT[currentLang].names[k]}`;
+      adhanQueue = (k === 'Fajr' ? ['adhan-fajr.mp3'] : []).concat(ADHAN_URLS); // أذان فجر خاص لو الملف موجود
+      adhanIdx = 0;
+      adhanAudio.src = adhanQueue[0];
+      adhanAudio.play().catch((e) => { console.warn('adhan', e); endAdhan(true); });
+    }
+
+    function endAdhan(skipped) {
+      if (!adhanActive) return;
+      adhanActive = false;
+      adhanAudio.pause();
+      if (adhanResume) {
+        adhanResume = false;
+        if (!usingSurah) audio.load();
+        audio.play().then(() => setPlayingUI(true)).catch(() => { stationSub.textContent = TEXTS[currentLang].subPaused; });
+      } else {
+        stationSub.textContent = TEXTS[currentLang].subPaused;
+      }
+    }
+
+    adhanAudio.addEventListener('ended', () => endAdhan(false));
+    adhanAudio.addEventListener('error', () => {
+      if (!adhanActive) return;
+      if (adhanIdx + 1 < adhanQueue.length) {
+        adhanAudio.src = adhanQueue[++adhanIdx];
+        adhanAudio.play().catch(() => endAdhan(true));
+      } else {
+        endAdhan(true);
+      }
+    });
+
+    setInterval(() => {
+      if (!adhanOn || adhanActive || !ptimes) return;
+      const now = tzNow(currentLoc().tz);
+      if (now.date !== ptimes.date) return;
+      for (const k of ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']) {
+        const ts = toSec(ptimes.t[k]);
+        const id = now.date + k;
+        if (now.sec >= ts && now.sec < ts + 90 && !adhanDone[id]) {
+          adhanDone[id] = true;
+          startAdhan(k);
+          break;
+        }
+      }
+    }, 1000);
+
+    // === حفظ آخر قارئ/سورة ===
+    let LAST = null;
+    try { LAST = JSON.parse(localStorage.getItem('last')); } catch (e) {}
+    function saveLast(i, num) {
+      try { localStorage.setItem('last', JSON.stringify({ k: stations[i].code || stations[i].name, num: num })); } catch (e) {}
+    }
+    async function restoreLast() {
+      if (!LAST || !LAST.k) return;
+      const i = stations.findIndex(x => (x.code || x.name) === LAST.k);
+      if (i < 0) return;
+      const s = stations[i];
+      const tok = playToken;
+      if (!LAST.num) { if (i !== currentIndex) selectStation(i, false); return; }
+      if (s.rid || s.find) await resolveStation(s);
+      if (playToken !== tok || !s.base || !s.list || s.list.indexOf(LAST.num) < 0) return;
+      currentIndex = i; usingSurah = true; listPos = s.list.indexOf(LAST.num);
+      stationName.textContent = `${stName(s)} — ${surahName(LAST.num)}`;
+      stationSub.textContent = TEXTS[currentLang].subDefault;
+      audio.src = trackUrl(s, LAST.num);
+      renderGrid();
+    }
+
+    // === بحث السور ===
+    function normSearch(x) {
+      return String(x || '').toLowerCase().replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/[-'’` ]/g, '').trim();
+    }
+    surahSearch.addEventListener('input', renderGrid);
+
+    // === مؤقت النوم ===
+    const SLEEP_STEPS = [0, 15, 30, 60];
+    let sleepIdx = 0, sleepEnd = 0, sleepTimer = null;
+    const sleepBtn = document.getElementById('sleepBtn');
+    function renderSleep() {
+      if (!sleepEnd) { sleepBtn.textContent = currentLang === 'ar' ? '☾ مؤقت النوم' : '☾ Timer'; return; }
+      const left = Math.max(1, Math.ceil((sleepEnd - Date.now()) / 60000));
+      sleepBtn.textContent = `☾ ${left}${currentLang === 'ar' ? 'د' : 'm'}`;
+    }
+    function sleepFire() {
+      sleepEnd = 0; sleepIdx = 0;
+      adhanResume = false;
+      audio.pause();
+      setPlayingUI(false);
+      stationSub.textContent = TEXTS[currentLang].subPaused;
+      renderSleep();
+    }
+    sleepBtn.addEventListener('click', () => {
+      sleepIdx = (sleepIdx + 1) % SLEEP_STEPS.length;
+      clearTimeout(sleepTimer);
+      const min = SLEEP_STEPS[sleepIdx];
+      sleepEnd = min ? Date.now() + min * 60000 : 0;
+      if (min) sleepTimer = setTimeout(sleepFire, min * 60000);
+      renderSleep();
+    });
+    setInterval(renderSleep, 20000);
+
+    // === موافقة الإحصاءات (Google Analytics) ===
+    const consentBar = document.getElementById('consentBar');
+    function renderConsent() {
+      const ar = currentLang === 'ar';
+      document.getElementById('consentText').textContent = ar ? 'نستخدم Google Analytics لإحصاءات زيارات مجهولة الهوية. هل توافق؟' : 'Usiamo Google Analytics per statistiche anonime sulle visite. Accetti?';
+      document.getElementById('consentYes').textContent = ar ? 'موافق' : 'Accetta';
+      document.getElementById('consentNo').textContent = ar ? 'لا' : 'Rifiuta';
+    }
+    function setConsent(v) {
+      try { localStorage.setItem('gaConsent', v); } catch (e) {}
+      consentBar.hidden = true;
+      if (v === 'yes' && window.__loadGA) window.__loadGA();
+    }
+    document.getElementById('consentYes').addEventListener('click', () => setConsent('yes'));
+    document.getElementById('consentNo').addEventListener('click', () => setConsent('no'));
+    try { if (!localStorage.getItem('gaConsent')) consentBar.hidden = false; } catch (e) {}
+    renderConsent();
+
     renderGrid();
     applyLang();
     selectStation(0, false);
+    restoreLast();
     renderCitySelect();
     loadPrayer();
     Promise.all(stations.filter(x => x.rid).map(resolveStation)).then(renderGrid);
