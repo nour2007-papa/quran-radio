@@ -16,7 +16,7 @@
   <link rel="canonical" href="https://quran-radio-vert.vercel.app/">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebSite","name":"إذاعة القرآن الكريم — Radio del Sacro Corano","url":"https://quran-radio-vert.vercel.app/","inLanguage":["ar","it"],"description":"بث مباشر 24/7 لتلاوات القرآن الكريم مع النص العربي والترجمة الإيطالية"}
+  {"@context":"https://schema.org","@type":"WebSite","name":"إذاعة القرآن الكريم — Radio del Sacro Corano","url":"https://quran-radio-vert.vercel.app/","inLanguage":["ar","it","en","fr"],"description":"بث مباشر 24/7 لتلاوات القرآن الكريم مع النص العربي والترجمة الإيطالية"}
   </script>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0A2624">
@@ -145,7 +145,7 @@
     .stage::before {
       content: '';
       position: absolute;
-      inset: 0;
+      top:0;right:0;bottom:0;left:0;
       background: radial-gradient(circle at 50% 0%, var(--gold-dim), transparent 60%);
       pointer-events: none;
       opacity: 0.5;
@@ -153,7 +153,7 @@
     .stage::after {
       content: '';
       position: absolute;
-      inset: 8px;
+      top:8px;right:8px;bottom:8px;left:8px;
       border: 1px solid rgba(201,160,80,0.25);
       border-radius: 16px;
       pointer-events: none;
@@ -263,7 +263,7 @@
     .play-btn::before {
       content: '';
       position: absolute;
-      inset: 0;
+      top:0;right:0;bottom:0;left:0;
       background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2), transparent 70%);
       opacity: 0;
       transition: opacity 0.2s ease;
@@ -398,7 +398,7 @@
     .station-card::before {
       content: '';
       position: absolute;
-      inset: 0;
+      top:0;right:0;bottom:0;left:0;
       background: linear-gradient(135deg, rgba(201,160,80,0.08), transparent 60%);
       opacity: 0;
       transition: opacity 0.2s ease;
@@ -724,37 +724,45 @@
     .adhan-toggle[aria-checked="true"] .dot { background: var(--gold); opacity: 1; }
     .surah-search { display: block; width: 100%; box-sizing: border-box; background: var(--bg-panel-2); color: var(--cream); border: 1px solid var(--line); border-radius: 20px; padding: 10px 16px; font-family: Tajawal, sans-serif; font-size: 14px; margin: 0 0 14px; }
     .prayer-actions select + select { max-width: 150px; }
-    .consent-bar { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 50; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; background: var(--bg-panel-2); border: 1px solid var(--gold); border-radius: 14px; padding: 12px 14px; font-size: 13px; color: var(--cream); }
-    .consent-bar[hidden] { display: none; }
-    .consent-bar button { background: transparent; border: 1px solid var(--gold); color: var(--gold-light); border-radius: 20px; padding: 6px 14px; font-family: Tajawal, sans-serif; font-size: 13px; cursor: pointer; margin-inline-start: 6px; }
     .prayer-note { font-size: 11px; color: var(--sage); margin-top: 10px; opacity: 0.8; }
     :focus-visible { outline: 2px solid var(--gold-light); outline-offset: 3px; border-radius: 8px; }
     .surah-chip, .card-top .txt { -webkit-tap-highlight-color: transparent; }
     noscript p { text-align:center; color: var(--gold-light); }
 
   </style>
-  <!-- Google Analytics 4: يتحمّل فقط بعد موافقة المستخدم -->
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PKH4THLV0Y"></script>
   <script>
-    (function () {
-      var GA_ID = 'G-PKH4THLV0Y';
-      window.__loadGA = function () {
-        if (window.__gaLoaded) return;
-        window.__gaLoaded = true;
-        window.dataLayer = window.dataLayer || [];
-        window.gtag = function () { dataLayer.push(arguments); };
-        gtag('js', new Date());
-        gtag('config', GA_ID, { anonymize_ip: true });
-        var s = document.createElement('script');
-        s.async = true;
-        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
-        document.head.appendChild(s);
-      };
-      try { if (localStorage.getItem('gaConsent') === 'yes') window.__loadGA(); } catch (e) {}
-    })();
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-PKH4THLV0Y');
   </script>
+
+<style>
+/* === وضع المصحف المضغوط (للتلفزيون): يخفي الأعلى ويعرض الآيات + الترجمة === */
+body.mushaf-open { padding-top: 10px; padding-bottom: 20px; }
+body.mushaf-open .top-band, body.mushaf-open header, body.mushaf-open .prayer-section,
+body.mushaf-open .star-wrap, body.mushaf-open .live-tag, body.mushaf-open .station-sub,
+body.mushaf-open .vol-row { display: none; }
+body.mushaf-open .stage { margin-top: 0; max-width: 1000px; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-radius: 16px; }
+body.mushaf-open .stage::after { display: none; }
+body.mushaf-open .station-name { font-size: 22px; margin: 0; flex: 1; }
+body.mushaf-open .controls { margin: 0; gap: 14px; }
+body.mushaf-open .play-btn { width: 46px; height: 46px; }
+body.mushaf-open .play-btn svg { width: 20px; height: 20px; }
+body.mushaf-open .bars { height: 24px; }
+body.mushaf-open .mushaf-section { max-width: 1000px; margin-top: 10px; }
+body.mushaf-open .mushaf-card { padding: 12px 18px; }
+body.mushaf-open .mushaf-head { margin-bottom: 8px; padding-bottom: 8px; }
+body.mushaf-open .mushaf-body { max-height: calc(var(--vh, 600px) - 150px); min-height: 260px; }
+body.mushaf-open .ayah-row { padding: 8px 10px; }
+body.mushaf-open .ayah-row .arabic { font-size: 24px; line-height: 1.9; }
+body.mushaf-open .ayah-row .italian { font-size: 18px; line-height: 1.6; margin-top: 4px; }
+.mushaf-close { width: 34px; height: 34px; }
+</style>
 </head>
 <body>
-  <div class="consent-bar" id="consentBar" role="dialog" aria-live="polite" hidden><span id="consentText"></span><span><button type="button" id="consentYes"></button><button type="button" id="consentNo"></button></span></div>
   <noscript><p>يتطلب هذا الموقع تفعيل جافاسكربت · Questo sito richiede JavaScript.</p></noscript>
   <div class="top-band">
     <div class="rule"></div>
@@ -870,7 +878,7 @@
     const SURAH_NAMES = ["", "الفاتحة", "البقرة", "آل عمران", "النساء", "المائدة", "الأنعام", "الأعراف", "الأنفال", "التوبة", "يونس", "هود", "يوسف", "الرعد", "إبراهيم", "الحجر", "النحل", "الإسراء", "الكهف", "مريم", "طه", "الأنبياء", "الحج", "المؤمنون", "النور", "الفرقان", "الشعراء", "النمل", "القصص", "العنكبوت", "الروم", "لقمان", "السجدة", "الأحزاب", "سبأ", "فاطر", "يس", "الصافات", "ص", "الزمر", "غافر", "فصلت", "الشورى", "الزخرف", "الدخان", "الجاثية", "الأحقاف", "محمد", "الفتح", "الحجرات", "ق", "الذاريات", "الطور", "النجم", "القمر", "الرحمن", "الواقعة", "الحديد", "المجادلة", "الحشر", "الممتحنة", "الصف", "الجمعة", "المنافقون", "التغابن", "الطلاق", "التحريم", "الملك", "القلم", "الحاقة", "المعارج", "نوح", "الجن", "المزمل", "المدثر", "القيامة", "الإنسان", "المرسلات", "النبأ", "النازعات", "عبس", "التكوير", "الإنفطار", "المطففين", "الإنشقاق", "البروج", "الطارق", "الأعلى", "الغاشية", "الفجر", "البلد", "الشمس", "الليل", "الضحى", "الشرح", "التين", "العلق", "القدر", "البينة", "الزلزلة", "العاديات", "القارعة", "التكاثر", "العصر", "الهمزة", "الفيل", "قريش", "الماعون", "الكوثر", "الكافرون", "النصر", "المسد", "الإخلاص", "الفلق", "الناس"];
     const SURAH_NAMES_IT = ["", "Al-Fatiha", "Al-Baqara", "Al-Imran", "An-Nisa", "Al-Ma'ida", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawba", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Ash-Shu'ara", "An-Naml", "Al-Qasas", "Al-'Ankabut", "Ar-Rum", "Luqman", "As-Sajda", "Al-Ahzab", "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila", "Al-Hashr", "Al-Mumtahana", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqa", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddaththir", "Al-Qiyama", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "'Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Ghashiya", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Layl", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-'Alaq", "Al-Qadr", "Al-Bayyina", "Az-Zalzala", "Al-'Adiyat", "Al-Qari'a", "At-Takathur", "Al-'Asr", "Al-Humaza", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"];
     function surahName(n) {
-      return (currentLang === 'it' ? SURAH_NAMES_IT[n] : SURAH_NAMES[n]) || '';
+      return (currentLang === 'ar' ? SURAH_NAMES[n] : SURAH_NAMES_IT[n]) || '';
     }
 
     const FULL_LIST = Array.from({ length: 114 }, (_, i) => i + 1);
@@ -1007,12 +1015,72 @@
         mushafPlaceholder: "Scegli una sura per vedere i versetti qui",
         footer1: "La diretta funziona 24 ore su 24. Cambiando radio la riproduzione parte automaticamente.<br>Fonte rete radio del Corano: mp3quran.net",
         footer2: "",
+        langBtn: "ENG"
+      },
+      en: {
+        eyebrow: "Live streaming 24/7",
+        title: "Holy Quran Radio",
+        live: "On air now",
+        subDefault: "Press play to start listening",
+        subConnecting: "Connecting...",
+        subLive: "Continuous live stream",
+        subSurah: "Continuous Quran playback",
+        subPaused: "Paused",
+        subLoading: "Loading...",
+        subErrorRadio: "Connection failed, try another station",
+        subErrorSurah: "Unable to play the surah",
+        subErrorGeneric: "Connection failed, try another station or surah",
+        listHeading: "Choose a reciter or station",
+        mushafSub: "Arabic text and English translation",
+        mushafLoading: "Loading verses...",
+        mushafError: "Unable to load the text, please try again",
+        mushafPlaceholder: "Choose a surah to see its verses here",
+        footer1: "The stream runs 24 hours a day. Changing station starts playback automatically.<br>Quran radio network source: mp3quran.net",
+        footer2: "",
+        langBtn: "FRA"
+      },
+      fr: {
+        eyebrow: "Diffusion en direct 24h/24",
+        title: "Radio du Saint Coran",
+        live: "En direct",
+        subDefault: "Appuyez sur lecture pour commencer l'écoute",
+        subConnecting: "Connexion en cours...",
+        subLive: "Diffusion en direct continue",
+        subSurah: "Lecture continue du Coran",
+        subPaused: "En pause",
+        subLoading: "Chargement...",
+        subErrorRadio: "Échec de la connexion, essayez une autre radio",
+        subErrorSurah: "Impossible de lire la sourate",
+        subErrorGeneric: "Échec de la connexion, essayez une autre radio ou sourate",
+        listHeading: "Choisissez le récitateur ou la radio",
+        mushafSub: "Texte arabe et traduction française",
+        mushafLoading: "Chargement des versets...",
+        mushafError: "Impossible de charger le texte, réessayez",
+        mushafPlaceholder: "Choisissez une sourate pour afficher ses versets ici",
+        footer1: "La diffusion fonctionne 24h/24. En changeant de radio, la lecture démarre automatiquement.<br>Source du réseau radio du Coran : mp3quran.net",
+        footer2: "",
         langBtn: "العربية"
       }
     };
 
     let currentLang = 'ar';
-    try { const sv = localStorage.getItem('lang'); if (sv === 'it' || sv === 'ar') currentLang = sv; } catch (e) {}
+    const LANGS = ['ar', 'it', 'en', 'fr'];
+    try { const sv = localStorage.getItem('lang'); if (LANGS.indexOf(sv) >= 0) currentLang = sv; } catch (e) {}
+    function L(ar, it, en, fr) { return { ar: ar, it: it, en: en, fr: fr }[currentLang]; }
+    const TR_NAMES = {
+      'Radio Principale': { en: 'Main Radio', fr: 'Radio principale' },
+      'Radio del Sacro Corano dal Cairo': { en: 'Holy Quran Radio from Cairo', fr: 'Radio du Saint Coran du Caire' },
+      'Recitazioni toccanti': { en: 'Heartfelt Recitations', fr: 'Récitations émouvantes' },
+      'Sura Al-Baqarah vari lettori': { en: 'Surah Al-Baqarah, various reciters', fr: 'Sourate Al-Baqara, divers récitateurs' }
+    };
+    const TR_TAGS = {
+      'Varie': { en: 'Various', fr: 'Divers' },
+      "Radio d'Egitto": { en: 'Egyptian radio', fr: "Radio d'Égypte" },
+      'Lettore': { en: 'Reciter', fr: 'Récitateur' },
+      'Mushaf Al-Muallim': { en: 'Mushaf Al-Muallim', fr: 'Mushaf Al-Muallim' },
+      'Speciale': { en: 'Special', fr: 'Spécial' },
+      'Corano completo': { en: 'Complete Quran', fr: 'Coran complet' }
+    };
 
     function applyLang() {
       const t = TEXTS[currentLang];
@@ -1022,9 +1090,8 @@
       document.getElementById('pageTitle').textContent = t.title;
       document.getElementById('liveTagText').textContent = t.live;
       document.getElementById('listHeadingText').textContent = t.listHeading;
-      document.getElementById('surahSearch').placeholder = currentLang === 'ar' ? 'ابحث عن سورة أو قارئ' : 'Cerca una sura o un lettore';
+      document.getElementById('surahSearch').placeholder = L('ابحث عن سورة أو قارئ', 'Cerca una sura o un lettore', 'Search for a surah or reciter', 'Rechercher une sourate ou un récitateur');
       if (typeof renderSleep === 'function') renderSleep();
-      if (typeof renderConsent === 'function') renderConsent();
       document.getElementById('mushafSub').textContent = t.mushafSub;
       document.getElementById('footerText').innerHTML = t.footer1 + (t.footer2 ? `<br>${t.footer2}` : '');
       document.getElementById('langToggle').textContent = t.langBtn;
@@ -1050,6 +1117,7 @@
     let mushafToken = 0;
     let lastHighlighted = -1;
 
+    const TRANS_EDITION = { ar: 'it.piccardo', it: 'it.piccardo', en: 'en.sahih', fr: 'fr.hamidullah' };
     async function loadMushaf(stationIndex, surahNum) {
       const s = stations[stationIndex];
       const myToken = ++mushafToken;
@@ -1059,11 +1127,11 @@
       lastHighlighted = -1;
 
       mushafSection.style.display = 'block';
-      mushafTitle.textContent = `${surahName(surahNum)} — ${currentLang === 'ar' ? s.name : s.nameIt}`;
+      mushafTitle.textContent = `${surahName(surahNum)} — ${stName(s)}`;
       mushafBody.innerHTML = `<div class="mushaf-loading">${TEXTS[currentLang].mushafLoading}</div>`;
 
       try {
-        const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNum}/editions/quran-uthmani,it.piccardo`);
+        const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNum}/editions/quran-uthmani,${TRANS_EDITION[currentLang]}`);
         if (!res.ok) throw new Error(`status ${res.status}`);
         const data = await res.json();
         if (myToken !== mushafToken) return;
@@ -1089,6 +1157,8 @@
           row.append(ar, it);
           mushafBody.appendChild(row);
         });
+        mushafBody.setAttribute('tabindex', '0');
+        { const a = document.activeElement; if (!a || a === document.body || grid.contains(a)) mushafBody.focus(); }
 
         // تقدير احتياطي: توزيع زمن السورة على الآيات حسب طول النص
         ayahWeights = arabic.map(a => Math.max(1, a.text.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\s]/g, '').length));
@@ -1102,9 +1172,9 @@
             const raw = await res2.json();
             const list = (Array.isArray(raw) ? raw : (raw.ayat_timing || raw.data || []))
               .map(t => ({
-                ayah: Number(t.ayah ?? t.ayah_number),
-                start: Number(t.start_time ?? t.starttime),
-                end: Number(t.end_time ?? t.endtime)
+                ayah: Number(t.ayah != null ? t.ayah : t.ayah_number),
+                start: Number(t.start_time != null ? t.start_time : t.starttime),
+                end: Number(t.end_time != null ? t.end_time : t.endtime)
               }))
               .filter(t => Number.isFinite(t.ayah) && Number.isFinite(t.start) && Number.isFinite(t.end));
             // الآية 0 = البسملة، تُعرض ضمن الآية 1
@@ -1152,13 +1222,26 @@
     }
 
     function stName(s) {
-      return currentLang === 'ar' ? s.name : s.nameIt;
+      if (currentLang === 'ar') return s.name;
+      if (currentLang === 'it') return s.nameIt;
+      if (TR_NAMES[s.nameIt]) return TR_NAMES[s.nameIt][currentLang];
+      return s.nameIt.replace(/^Sceicco /, currentLang === 'en' ? 'Sheikh ' : 'Cheikh ');
     }
     function stTag(s) {
-      return currentLang === 'ar' ? s.tag : s.tagIt;
+      if (currentLang === 'ar') return s.tag;
+      if (currentLang === 'it') return s.tagIt;
+      return TR_TAGS[s.tagIt] ? TR_TAGS[s.tagIt][currentLang] : s.tagIt;
     }
 
     function renderGrid() {
+      const sel = '[tabindex="0"], button';
+      const f = document.activeElement;
+      const idx = (f && grid.contains(f)) ? Array.prototype.indexOf.call(grid.querySelectorAll(sel), f) : -1;
+      renderGridRaw();
+      if (idx >= 0) { const n = grid.querySelectorAll(sel)[idx]; if (n) n.focus(); }
+    }
+
+    function renderGridRaw() {
       grid.innerHTML = '';
       const q = normSearch(surahSearch.value || '');
       stations.forEach((s, i) => {
@@ -1191,7 +1274,7 @@
           const btn = document.createElement('button');
           btn.className = `expand-btn${(openIndex === i || q) ? ' open' : ''}`;
           btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>`;
-          btn.setAttribute('aria-label', currentLang === 'ar' ? 'عرض السور' : 'Mostra sure');
+          btn.setAttribute('aria-label', L('عرض السور', 'Mostra sure', 'Show surahs', 'Afficher les sourates'));
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
             openIndex = openIndex === i ? -1 : i;
@@ -1299,7 +1382,7 @@
       pauseIcon.style.display = isPlaying ? 'block' : 'none';
       star.classList.toggle('playing', isPlaying);
       bars.classList.toggle('playing', isPlaying);
-      playBtn.setAttribute('aria-label', isPlaying ? (currentLang === 'ar' ? 'إيقاف' : 'Pausa') : (currentLang === 'ar' ? 'تشغيل' : 'Play'));
+      playBtn.setAttribute('aria-label', isPlaying ? L('إيقاف', 'Pausa', 'Pause', 'Pause') : L('تشغيل', 'Play', 'Play', 'Lecture'));
       if (isPlaying && !usingSurah) {
         stationSub.textContent = TEXTS[currentLang].subLive;
       }
@@ -1404,11 +1487,15 @@
     });
 
     document.getElementById('langToggle').addEventListener('click', () => {
-      currentLang = currentLang === 'ar' ? 'it' : 'ar';
+      currentLang = LANGS[(LANGS.indexOf(currentLang) + 1) % LANGS.length];
       try { localStorage.setItem('lang', currentLang); } catch (e) {}
       applyLang();
       if (typeof renderGrid === 'function') renderGrid();
       refreshNowPlaying();
+      // إعادة تحميل ترجمة الآيات باللغة الجديدة لو المصحف مفتوح
+      const cs = stations[currentIndex];
+      if (usingSurah && cs && cs.list && mushafBody.querySelector('.ayah-row')) loadMushaf(currentIndex, cs.list[listPos]);
+      if (ploc.type === 'geo') refreshGeoName();
     });
 
     function refreshNowPlaying() {
@@ -1430,31 +1517,45 @@
             mine: 'موقعي الحالي', denied: 'تعذر تحديد الموقع، اختر مدينتك', btn: 'تحديد موقعي',
             note: 'الحساب: {m} — قد يختلف دقائق قليلة عن مسجدك',
             adhan: 'تشغيل الأذان وإيقاف التلاوة وقت الصلاة', adhanNow: 'أذان',
+            locating: 'جاري تحديد الموقع...', updated: 'تم تحديث الموقع',
             names: { Fajr: 'الفجر', Sunrise: 'الشروق', Dhuhr: 'الظهر', Asr: 'العصر', Maghrib: 'المغرب', Isha: 'العشاء' } },
       it: { title: 'Orari di preghiera', next: 'Prossima preghiera', inn: 'tra', h: 'h', m: 'm', loading: 'Caricamento...', error: 'Impossibile caricare gli orari',
             mine: 'La mia posizione', denied: 'Posizione non disponibile, scegli la città', btn: 'Rileva posizione',
             note: 'Calcolo: {m} — può differire di qualche minuto dalla tua moschea',
             adhan: "Adhan all'orario di preghiera (la recitazione si ferma)", adhanNow: 'Adhan',
-            names: { Fajr: 'Fajr', Sunrise: 'Alba', Dhuhr: 'Dhuhr', Asr: 'Asr', Maghrib: 'Maghrib', Isha: 'Isha' } }
+            locating: 'Rilevamento della posizione...', updated: 'Posizione aggiornata',
+            names: { Fajr: 'Fajr', Sunrise: 'Alba', Dhuhr: 'Dhuhr', Asr: 'Asr', Maghrib: 'Maghrib', Isha: 'Isha' } },
+      en: { title: 'Prayer times', next: 'Next prayer', inn: 'in', h: 'h', m: 'm', loading: 'Loading...', error: 'Unable to load prayer times',
+            mine: 'My location', denied: 'Location unavailable, choose your city', btn: 'Detect my location',
+            note: 'Calculation: {m} — may differ by a few minutes from your mosque',
+            adhan: 'Play the Adhan at prayer time (recitation pauses)', adhanNow: 'Adhan',
+            locating: 'Detecting your location...', updated: 'Location updated',
+            names: { Fajr: 'Fajr', Sunrise: 'Sunrise', Dhuhr: 'Dhuhr', Asr: 'Asr', Maghrib: 'Maghrib', Isha: 'Isha' } },
+      fr: { title: 'Horaires de prière', next: 'Prochaine prière', inn: 'dans', h: 'h', m: 'min', loading: 'Chargement...', error: 'Impossible de charger les horaires',
+            mine: 'Ma position', denied: 'Position indisponible, choisissez votre ville', btn: 'Détecter ma position',
+            note: 'Calcul : {m} — peut différer de quelques minutes de votre mosquée',
+            adhan: "Adhan à l'heure de la prière (la récitation s'arrête)", adhanNow: 'Adhan',
+            locating: 'Détection de la position...', updated: 'Position mise à jour',
+            names: { Fajr: 'Fajr', Sunrise: 'Lever du soleil', Dhuhr: 'Dhouhr', Asr: 'Asr', Maghrib: 'Maghrib', Isha: 'Icha' } }
     };
     const CITIES = [
-      { id: 'milano', ar: 'ميلانو', it: 'Milano', lat: 45.4642, lon: 9.19 },
-      { id: 'roma', ar: 'روما', it: 'Roma', lat: 41.9028, lon: 12.4964 },
-      { id: 'torino', ar: 'تورينو', it: 'Torino', lat: 45.0703, lon: 7.6869 },
-      { id: 'napoli', ar: 'نابولي', it: 'Napoli', lat: 40.8518, lon: 14.2681 },
-      { id: 'bologna', ar: 'بولونيا', it: 'Bologna', lat: 44.4949, lon: 11.3426 },
-      { id: 'firenze', ar: 'فلورنسا', it: 'Firenze', lat: 43.7696, lon: 11.2558 },
-      { id: 'genova', ar: 'جنوا', it: 'Genova', lat: 44.4056, lon: 8.9463 },
-      { id: 'venezia', ar: 'البندقية', it: 'Venezia', lat: 45.4408, lon: 12.3155 },
-      { id: 'bergamo', ar: 'برغامو', it: 'Bergamo', lat: 45.6983, lon: 9.6773 },
-      { id: 'brescia', ar: 'بريشيا', it: 'Brescia', lat: 45.5416, lon: 10.2118 },
-      { id: 'palermo', ar: 'باليرمو', it: 'Palermo', lat: 38.1157, lon: 13.3615 }
+      { id: 'milano', ar: 'ميلانو', it: 'Milano', en: 'Milan', fr: 'Milan', lat: 45.4642, lon: 9.19 },
+      { id: 'roma', ar: 'روما', it: 'Roma', en: 'Rome', fr: 'Rome', lat: 41.9028, lon: 12.4964 },
+      { id: 'torino', ar: 'تورينو', it: 'Torino', en: 'Turin', fr: 'Turin', lat: 45.0703, lon: 7.6869 },
+      { id: 'napoli', ar: 'نابولي', it: 'Napoli', en: 'Naples', fr: 'Naples', lat: 40.8518, lon: 14.2681 },
+      { id: 'bologna', ar: 'بولونيا', it: 'Bologna', en: 'Bologna', fr: 'Bologne', lat: 44.4949, lon: 11.3426 },
+      { id: 'firenze', ar: 'فلورنسا', it: 'Firenze', en: 'Florence', fr: 'Florence', lat: 43.7696, lon: 11.2558 },
+      { id: 'genova', ar: 'جنوا', it: 'Genova', en: 'Genoa', fr: 'Gênes', lat: 44.4056, lon: 8.9463 },
+      { id: 'venezia', ar: 'البندقية', it: 'Venezia', en: 'Venice', fr: 'Venise', lat: 45.4408, lon: 12.3155 },
+      { id: 'bergamo', ar: 'برغامو', it: 'Bergamo', en: 'Bergamo', fr: 'Bergame', lat: 45.6983, lon: 9.6773 },
+      { id: 'brescia', ar: 'بريشيا', it: 'Brescia', en: 'Brescia', fr: 'Brescia', lat: 45.5416, lon: 10.2118 },
+      { id: 'palermo', ar: 'باليرمو', it: 'Palermo', en: 'Palermo', fr: 'Palerme', lat: 38.1157, lon: 13.3615 }
     ];
     const METHODS = [
-      { id: 3, ar: 'رابطة العالم الإسلامي', it: 'Lega Mondiale Musulmana' },
-      { id: 5, ar: 'الهيئة المصرية العامة للمساحة', it: 'Autorità Generale Egiziana' },
-      { id: 4, ar: 'جامعة أم القرى', it: 'Umm al-Qura' },
-      { id: 2, ar: 'أمريكا الشمالية (ISNA)', it: 'Nord America (ISNA)' }
+      { id: 3, ar: 'رابطة العالم الإسلامي', it: 'Lega Mondiale Musulmana', en: 'Muslim World League', fr: 'Ligue islamique mondiale' },
+      { id: 5, ar: 'الهيئة المصرية العامة للمساحة', it: 'Autorità Generale Egiziana', en: 'Egyptian General Authority of Survey', fr: 'Autorité générale égyptienne' },
+      { id: 4, ar: 'جامعة أم القرى', it: 'Umm al-Qura', en: 'Umm al-Qura', fr: 'Umm al-Qura' },
+      { id: 2, ar: 'أمريكا الشمالية (ISNA)', it: 'Nord America (ISNA)', en: 'North America (ISNA)', fr: 'Amérique du Nord (ISNA)' }
     ];
     let pmethod = 3;
     try { const sv = Number(localStorage.getItem('pmethod')); if (METHODS.some(m => m.id === sv)) pmethod = sv; } catch (e) {}
@@ -1465,7 +1566,7 @@
 
     function currentLoc() {
       if (ploc.type === 'geo') {
-        return { lat: ploc.lat, lon: ploc.lon, tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Rome', geo: true };
+        return { lat: ploc.lat, lon: ploc.lon, tz: ploc.tz || Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Rome', geo: true };
       }
       const c = CITIES.find(x => x.id === ploc.id) || CITIES[0];
       return { lat: c.lat, lon: c.lon, tz: 'Europe/Rome', city: c };
@@ -1492,12 +1593,12 @@
       sel.innerHTML = '';
       if (ploc.type === 'geo') {
         const o = document.createElement('option');
-        o.value = 'geo'; o.textContent = `📍 ${t.mine}`;
+        o.value = 'geo'; o.textContent = `📍 ${ploc.name || t.mine}`;
         sel.appendChild(o);
       }
       CITIES.forEach(c => {
         const o = document.createElement('option');
-        o.value = c.id; o.textContent = currentLang === 'ar' ? c.ar : c.it;
+        o.value = c.id; o.textContent = c[currentLang];
         sel.appendChild(o);
       });
       sel.value = ploc.type === 'geo' ? 'geo' : ploc.id;
@@ -1516,7 +1617,7 @@
       renderCitySelect();
       document.getElementById('adhanLabel').textContent = t.adhan;
       const loc = currentLoc();
-      document.getElementById('prayerPlace').textContent = loc.geo ? t.mine : (currentLang === 'ar' ? loc.city.ar : loc.city.it);
+      document.getElementById('prayerPlace').textContent = loc.geo ? (ploc.name || t.mine) : loc.city[currentLang];
       const grid = document.getElementById('prayerGrid');
       const nextEl = document.getElementById('prayerNext');
       if (!ptimes) { return; }
@@ -1576,14 +1677,58 @@
       try { localStorage.setItem('pmethod', String(pmethod)); } catch (x) {}
       ptimes = null; loadPrayer();
     });
-    document.getElementById('prayerLocBtn').addEventListener('click', () => {
-      if (!navigator.geolocation) { document.getElementById('prayerNext').textContent = PT[currentLang].denied; return; }
-      navigator.geolocation.getCurrentPosition((pos) => {
-        ploc = { type: 'geo', lat: pos.coords.latitude, lon: pos.coords.longitude };
-        savePloc(); ptimes = null; loadPrayer();
-      }, () => {
-        document.getElementById('prayerNext').textContent = PT[currentLang].denied;
-      }, { timeout: 10000, maximumAge: 3600000 });
+    // === تحديد الموقع تلقائيًا: GPS أولًا، وبعدها الـ IP (التلفزيون غالبًا مفيهوش GPS) ===
+    function gpsLocate() {
+      return new Promise((res, rej) => {
+        if (!navigator.geolocation) return rej(new Error('no-geo'));
+        navigator.geolocation.getCurrentPosition(
+          (p) => res({ lat: p.coords.latitude, lon: p.coords.longitude }),
+          rej, { timeout: 6000, maximumAge: 3600000 });
+      });
+    }
+    async function ipLocate() {
+      const apis = [
+        async () => { const d = await (await fetch('https://ipwho.is/')).json(); if (d.success === false) throw new Error('ipwho'); return { lat: d.latitude, lon: d.longitude, name: d.city, tz: d.timezone && d.timezone.id }; },
+        async () => { const d = await (await fetch('https://get.geojs.io/v1/ip/geo.json')).json(); return { lat: Number(d.latitude), lon: Number(d.longitude), name: d.city, tz: d.timezone }; },
+        async () => { const d = await (await fetch('https://ipapi.co/json/')).json(); return { lat: d.latitude, lon: d.longitude, name: d.city, tz: d.timezone }; }
+      ];
+      for (const api of apis) {
+        try { const r = await api(); if (Number.isFinite(r.lat) && Number.isFinite(r.lon)) return r; } catch (e) { console.warn('ip-locate', e); }
+      }
+      throw new Error('ip-failed');
+    }
+    async function reverseName(lat, lon) {
+      try {
+        const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=${currentLang}`);
+        const d = await r.json();
+        return d.city || d.locality || '';
+      } catch (e) { return ''; }
+    }
+    async function refreshGeoName() {
+      if (ploc.type !== 'geo') return;
+      const n = await reverseName(ploc.lat, ploc.lon);
+      if (n && ploc.type === 'geo') { ploc.name = n; savePloc(); renderPrayer(); }
+    }
+    let locBusy = false;
+    document.getElementById('prayerLocBtn').addEventListener('click', async () => {
+      if (locBusy) return;
+      locBusy = true;
+      const nextEl = document.getElementById('prayerNext');
+      nextEl.textContent = PT[currentLang].locating;
+      try {
+        let pos = null;
+        try { pos = await gpsLocate(); } catch (e) { pos = await ipLocate(); }
+        const tz = pos.tz || Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Rome';
+        let name = await reverseName(pos.lat, pos.lon);
+        if (!name) name = pos.name || '';
+        ploc = { type: 'geo', lat: pos.lat, lon: pos.lon, tz: tz, name: name };
+        savePloc(); ptimes = null;
+        await loadPrayer();
+      } catch (e) {
+        console.warn('locate', e);
+        nextEl.textContent = PT[currentLang].denied;
+      }
+      locBusy = false;
     });
     setInterval(() => {
       if (!ptimes) return;
@@ -1698,9 +1843,9 @@
     let sleepIdx = 0, sleepEnd = 0, sleepTimer = null;
     const sleepBtn = document.getElementById('sleepBtn');
     function renderSleep() {
-      if (!sleepEnd) { sleepBtn.textContent = currentLang === 'ar' ? '☾ مؤقت النوم' : '☾ Timer'; return; }
+      if (!sleepEnd) { sleepBtn.textContent = '☾ ' + L('مؤقت النوم', 'Timer', 'Sleep timer', 'Minuteur'); return; }
       const left = Math.max(1, Math.ceil((sleepEnd - Date.now()) / 60000));
-      sleepBtn.textContent = `☾ ${left}${currentLang === 'ar' ? 'د' : 'm'}`;
+      sleepBtn.textContent = `☾ ${left}${L('د', 'm', 'm', 'min')}`;
     }
     function sleepFire() {
       sleepEnd = 0; sleepIdx = 0;
@@ -1720,24 +1865,6 @@
     });
     setInterval(renderSleep, 20000);
 
-    // === موافقة الإحصاءات (Google Analytics) ===
-    const consentBar = document.getElementById('consentBar');
-    function renderConsent() {
-      const ar = currentLang === 'ar';
-      document.getElementById('consentText').textContent = ar ? 'نستخدم Google Analytics لإحصاءات زيارات مجهولة الهوية. هل توافق؟' : 'Usiamo Google Analytics per statistiche anonime sulle visite. Accetti?';
-      document.getElementById('consentYes').textContent = ar ? 'موافق' : 'Accetta';
-      document.getElementById('consentNo').textContent = ar ? 'لا' : 'Rifiuta';
-    }
-    function setConsent(v) {
-      try { localStorage.setItem('gaConsent', v); } catch (e) {}
-      consentBar.hidden = true;
-      if (v === 'yes' && window.__loadGA) window.__loadGA();
-    }
-    document.getElementById('consentYes').addEventListener('click', () => setConsent('yes'));
-    document.getElementById('consentNo').addEventListener('click', () => setConsent('no'));
-    try { if (!localStorage.getItem('gaConsent')) consentBar.hidden = false; } catch (e) {}
-    renderConsent();
-
     renderGrid();
     applyLang();
     selectStation(0, false);
@@ -1749,11 +1876,114 @@
       Promise.all(stations.filter(x => x.find).map(resolveStation)).then(renderGrid);
     }, 2500);
 
-    if ('serviceWorker' in navigator) {
+    if (false && 'serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js').catch(() => {});
       });
     }
   </script>
+<style>
+  /* Tizen 5 (Chromium 63) لا يدعم :focus-visible */
+  button:focus, select:focus, input:focus, [tabindex]:focus { outline: 3px solid #f0d078 !important; outline-offset: 3px; }
+</style>
+<script>
+/* تنقّل بالريموت (D-pad) لتلفزيون Tizen */
+(function () {
+  var SEL = 'button, select, input, [tabindex="0"]';
+  function visible(el) {
+    if (el.disabled) return false;
+    var r = el.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) return false;
+    var st = getComputedStyle(el);
+    return st.visibility !== 'hidden' && st.display !== 'none';
+  }
+  function list() { return Array.prototype.filter.call(document.querySelectorAll(SEL), visible); }
+  function center(r) { return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+  function go(cur, dir) {
+    var items = list();
+    if (!cur || items.indexOf(cur) < 0) { if (items[0]) focusEl(items[0]); return; }
+    var c = center(cur.getBoundingClientRect()), best = null, bestScore = Infinity;
+    items.forEach(function (el) {
+      if (el === cur) return;
+      var p = center(el.getBoundingClientRect()), dx = p.x - c.x, dy = p.y - c.y, main, cross;
+      if (dir === 'left')  { main = -dx; cross = Math.abs(dy); }
+      if (dir === 'right') { main = dx;  cross = Math.abs(dy); }
+      if (dir === 'up')    { main = -dy; cross = Math.abs(dx); }
+      if (dir === 'down')  { main = dy;  cross = Math.abs(dx); }
+      if (main <= 1) return;
+      var score = main + cross * 2.5;
+      if (score < bestScore) { bestScore = score; best = el; }
+    });
+    if (best) focusEl(best);
+    else if (dir === 'down') window.scrollBy(0, 200);
+    else if (dir === 'up') window.scrollBy(0, -200);
+  }
+  function focusEl(el) {
+    el.focus();
+    try { el.scrollIntoView({ block: 'center' }); } catch (e) { el.scrollIntoView(); }
+  }
+  var KEYS = { 37: 'left', 38: 'up', 39: 'right', 40: 'down' };
+  document.addEventListener('keydown', function (e) {
+    if (e.defaultPrevented) return;
+    var k = e.keyCode, cur = document.activeElement;
+    if (KEYS[k]) {
+      if (cur && cur.id === 'mushafBody' && (k === 38 || k === 40)) {
+        var mb = cur, top0 = mb.scrollTop;
+        mb.scrollTop += (k === 40 ? 1 : -1) * Math.round(mb.clientHeight * 0.6);
+        if (mb.scrollTop !== top0) { e.preventDefault(); return; }
+      }
+      if (cur && cur.type === 'range' && (k === 37 || k === 39)) {
+        var step = 0.05, v = parseFloat(cur.value);
+        cur.value = Math.min(1, Math.max(0, v + ((k === 39) ? step : -step)));
+        cur.dispatchEvent(new Event('input', { bubbles: true }));
+        e.preventDefault(); return;
+      }
+      e.preventDefault(); go(cur, KEYS[k]); return;
+    }
+    if (k === 13 && cur && cur !== document.body && cur.tagName !== 'SELECT' && cur.tagName !== 'INPUT') {
+      /* OK: يضغط العنصر حتى لو لم يتصرف كزر */
+      if (cur.tagName !== 'BUTTON') { e.preventDefault(); cur.click(); }
+      return;
+    }
+    if (k === 10009) { /* Back */
+      var close = document.getElementById('mushafClose');
+      var sec = document.getElementById('mushafSection');
+      if (sec && sec.style.display !== 'none' && close) { close.click(); return; }
+      try { tizen.application.getCurrentApplication().exit(); } catch (x) {}
+      return;
+    }
+    var pb = document.getElementById('playBtn');
+    if (pb && (k === 415 || k === 19 || k === 10252)) { pb.click(); } /* Play / Pause / PlayPause */
+  });
+  window.addEventListener('load', function () {
+    try {
+      ['MediaPlay', 'MediaPause', 'MediaPlayPause'].forEach(function (n) { tizen.tvinputdevice.registerKey(n); });
+    } catch (x) {}
+    var pb = document.getElementById('playBtn');
+    if (pb) pb.focus();
+  });
+})();
+</script>
+<script>
+/* تكبير العرض للشاشات الكبيرة (التلفزيون) */
+(function () {
+  function fit() {
+    var w = window.innerWidth, z = w >= 1280 ? Math.min(2, w / 1100) : 1;
+    document.body.style.zoom = z;
+    document.body.style.minHeight = (window.innerHeight / z) + 'px';
+    document.documentElement.style.setProperty('--vh', (window.innerHeight / z) + 'px');
+  }
+  fit(); window.addEventListener('resize', fit);
+  var sec = document.getElementById('mushafSection');
+  function sync() {
+    var open = sec.style.display !== 'none';
+    var was = document.body.classList.contains('mushaf-open');
+    document.body.classList.toggle('mushaf-open', open);
+    if (open && !was) window.scrollTo(0, 0);
+    if (!open && was) { var pb = document.getElementById('playBtn'); if (pb) pb.focus(); }
+  }
+  if (sec && window.MutationObserver) { new MutationObserver(sync).observe(sec, { attributes: true, attributeFilter: ['style'] }); sync(); }
+})();
+</script>
 </body>
 </html>
